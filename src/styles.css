@@ -1,1 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+.flicker {
+  animation: flicker 1s infinite;
+}
+
+.flicker_faster {
+  animation: flicker_faster 0.3s infinite;
+}
+@keyframes flicker {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.8); }
+}
+
+@keyframes flicker_faster {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
