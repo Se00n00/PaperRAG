@@ -58,6 +58,7 @@ export class App {
   scholarPapers: WritableSignal<any[]> = signal([])
   currentPaper:any
   currentIndex = signal(0)
+  index = 0
 
   constructor(private arxiv: ArXiv, private scholar: SementicScholar) {}
   search() {
@@ -65,8 +66,32 @@ export class App {
       this.scholarPapers.set(res.data)
       if(res.data.length > 0){
         this.currentPaper = res.data[this.currentIndex()]
-        console.log(this.currentPaper)
       }
     });
+
+  }
+
+  getlink(text:string){
+    const match = text.match(/https?:\/\/[^\s,]+/);
+
+    if (match) {
+      const link = match[0];
+      const pdfUrl = link.replace("/abs/", "/pdf/") + ".pdf";
+      return pdfUrl
+    } else {
+      return null
+    }
+  }
+  upList(){
+    this.currentIndex.update((val)=> (val+1)%this.scholarPapers().length)
+    this.currentPaper = this.scholarPapers().at(this.currentIndex())
+    this.index = this.currentIndex()
+  }
+  downList() {
+    this.currentIndex.update(val => {
+      const len = this.scholarPapers().length
+      return (val - 1 + len) % len
+    })
+    this.currentPaper = this.scholarPapers().at(this.currentIndex())
   }
 }
