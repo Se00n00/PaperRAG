@@ -1,17 +1,18 @@
 import { Component, signal, WritableSignal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ArXiv } from './service/ar-xiv';
 import { SementicScholar } from './service/sementic-scholar';
+import { Article } from '../article/article';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   imports: [
-    RouterOutlet,
     FormsModule,
-    CommonModule
+    CommonModule,
+    Article
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

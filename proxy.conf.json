@@ -1,0 +1,10 @@
+{
+  "/arxiv": {
+    "target": "https://arxiv.org",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/arxiv": ""
+    }
+  }
+}

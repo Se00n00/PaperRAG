@@ -59,7 +59,8 @@
               "buildTarget": "paper:build:production"
             },
             "development": {
-              "buildTarget": "paper:build:development"
+              "buildTarget": "paper:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

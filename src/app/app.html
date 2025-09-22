@@ -1,7 +1,7 @@
-<div class="relative h-full border border-black/[0.3] gap-10 bg-white flex flex-col justify-center items-center rounded-xl p-4"
+<div class="relative flex-1  h-full shadow-md border border-black/[0.4] gap-10 bg-white flex flex-col justify-center items-center rounded-xl p-4"
   [ngClass]="{
-    'justify-center':scholarPapers().length === 0,
-    'justify-end':scholarPapers().length > 0
+    '':scholarPapers().length === 0,
+    '':scholarPapers().length > 0
   }">
   <div class="absolute top-0 w-full flex justify-between p-3">
     <img src="frame.svg" class="h-9">
@@ -34,7 +34,7 @@
             </div>
           </div>
 
-          <div class="flex justify-between font-light text-sm items-center">
+          <div class="flex font-light text-sm">
             {{currentPaper.abstract}}
           </div>
         </div>
@@ -81,7 +81,11 @@
     
   }
 
-  <div class="relative bg-black/[0.05] rounded-2xl p-1.5">
+  <div class="relative bg-black/[0.05] backdrop-blur-md rounded-2xl p-1.5"
+  [ngClass]="{
+    'relative':scholarPapers().length === 0,
+    'fixed bottom-5':scholarPapers().length > 0
+  }">
 
     <div class="flex flex-col justify-between w-[80vw] sm:w-[60vw] lg:w-[40vw] gap-1">
       <div class="flex justify-between">
@@ -113,4 +117,6 @@
   </div>
 </div>
 
-<router-outlet />
+<div class="flex-1">
+  <app-article *ngIf="currentPaper" [paper_link]="getlink(currentPaper.openAccessPdf.disclaimer) || currentPaper.openAccessPdf.url"/>
+</div>

@@ -1,0 +1,14 @@
+<div class="flex flex-col gap-1 overflow-scroll">
+    <div class="flex justify-between bg-white p-4 shadow-md border border-black/[0.4] rounded-xl">
+        {{paper_title}}
+        <a [href]="paper_link">
+            <div class="hover:bg-black/[0.1] p-1 rounded-md border border-transparent hover:border-black/[0.1] transition-all">
+                <img src="icon/clip_black.svg" class="h-4 opacity-55 hover:opacity-100">
+            </div>
+        </a>
+    </div>
+    <div class="pdf-content bg-white p-4 shadow-md border border-black/[0.4] rounded-xl">
+        <div *ngIf="!pdfContent">Loading...</div>
+        {{pdfContent}}
+    </div>
+</div>
