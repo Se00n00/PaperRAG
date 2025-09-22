@@ -4,3 +4,5 @@ pydantic
 onnxruntime
 transformers
 numpy
+
+pinecone
