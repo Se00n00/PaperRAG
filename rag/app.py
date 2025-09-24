@@ -10,7 +10,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 import os
 
-from pinecone.grpc import PineconeGRPC as Pinecone
+from pinecone import Pinecone
 
 from langchain_core.messages import AIMessage
 
