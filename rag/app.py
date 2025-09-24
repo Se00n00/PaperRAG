@@ -52,8 +52,8 @@ def home():
     return {"message:","I will Make it"}
 
 #------------------------ ENDPOINT: /upsert
-pc = Pinecone(api_key="PINECONE_APIKEY")
-index = pc.Index(host="UNSIGNED_HOST")
+pc = Pinecone(api_key=os.environ.get("PINECONE_APIKEY"))
+index = pc.Index(host=os.environ.get("UNSIGNED_HOST"))
 
 @app.post("/upsert")
 def add_pdf(pdf_url:str, user_id=Depends(get_user_or_guest)):
