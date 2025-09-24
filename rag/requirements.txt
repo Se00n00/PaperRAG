@@ -6,3 +6,8 @@ transformers
 numpy
 
 pinecone
+
+PyMuPDF
+python-dotenv
+psycopg2
+supabase

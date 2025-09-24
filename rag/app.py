@@ -1,68 +1,87 @@
-from fastapi import FastAPI
+from Utils.get_pdf_contents import get_pdf_content
+from Node.agents import agentic_rag
+from fastapi import FastAPI, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List
 
-import onnxruntime as ort
-from transformers import AutoTokenizer
-import numpy as np
+import uuid
+from supabase import create_client, Client
+import psycopg2
+from dotenv import load_dotenv
+import os
 
-tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
-session = ort.InferenceSession("model.onnx")
+from pinecone.grpc import PineconeGRPC as Pinecone
 
+from langchain_core.messages import AIMessage
 
+#------------------------ 
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
+
+def get_user_or_guest(authorization: str = Header(None), x_guest_id: str = Header(None)):
+    
+    if authorization:
+        token = authorization.replace("Bearer ", "")
+        user_resp = supabase.auth.get_user(token)
+        if user_resp and user_resp.user:
+            return user_resp.user.id
+    
+    if x_guest_id:
+        return x_guest_id
+    return str(uuid.uuid4()) 
+
+#------------------------ SETUP: CORS
 app = FastAPI()
 origins = [
+    "http://localhost:4200",   # Angular dev server
     "*"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ["*"],      # or ["*"] for all origins (less secure)
+    allow_origins=["*"],        # or ["*"] for open access
     allow_credentials=True,
-    allow_methods=["*"],        # GET, POST, etc.
-    allow_headers=["*"],        # allow all headers
+    allow_methods=["*"],          # very important: allows OPTIONS
+    allow_headers=["*"],
 )
 
-class BatchedRequest(BaseModel):
-    texts: List[str]
-
+#------------------------ ENDPOINT: /
 @app.get("/")
-def read_root():
-    return {"message": "Serving is running XD"}
+def home():
+    return {"message:","I will Make it"}
 
-def from_CLS_2_Embeddings(inputs, last_hidden_state):
-    attention_mask = inputs["attention_mask"]
-    mask_expanded = np.expand_dims(attention_mask, -1).astype(np.float32)
-    sum_embeddings = np.sum(last_hidden_state * mask_expanded, axis=1)
-    sum_mask = np.clip(mask_expanded.sum(axis=1), a_min=1e-9, a_max=None)
-    mean_pooled = sum_embeddings / sum_mask
+#------------------------ ENDPOINT: /upsert
+pc = Pinecone(api_key="PINECONE_APIKEY")
+index = pc.Index(host="UNSIGNED_HOST")
 
-    # Normalize
-    embeddings = mean_pooled / np.linalg.norm(mean_pooled, axis=1, keepdims=True)
-
-    return embeddings
-
-@app.post("/get_embeddings")
-def get_embeddings(request:BatchedRequest):
+@app.post("/upsert")
+def add_pdf(pdf_url:str, user_id=Depends(get_user_or_guest)):
     try:
-        inputs = tokenizer(request.texts, return_tensors="np", padding=True, truncation=True)
-
-        # Run ONNX inference
-        outputs = session.run(
-            None,
-            {
-                "input_ids": inputs["input_ids"],
-                "attention_mask": inputs["attention_mask"]
-            }
-        )
-        last_hidden_state, _ = outputs
-
-        # Pooling
-        embeddings = from_CLS_2_Embeddings(inputs, last_hidden_state)
-
-        return {"embeddings": embeddings.tolist()}
-
-
+        content = get_pdf_content(pdf_url)
+        index.upsert(
+            vectors=[
+                {"values": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]},
+                {"values": [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]}
+            ],
+            namespace=user_id
+            )
     except Exception as e:
-        return {"error": str(e)}
+        return {"error":f"Content's Didn't Upserted Exception: {e}"}
+    
+#------------------------ ENDPOINT: /chat
+@app.post("/chat")
+async def chat(query:str, user_id=Depends(get_user_or_guest)):
+    try:
+        config = {"configurable": {"thread_id": user_id}}
+        def event_generator():
+            for chunk, meta in agentic_rag.stream(
+                {'query':query}, config, stream_mode = "messages"
+            ):
+                if isinstance(chunk, AIMessage):
+                    yield chunk.content
+        
+        return StreamingResponse(event_generator(), media_type='text/plain')
+    except Exception as e:
+        return {"error":f"Exception: {e}"}
