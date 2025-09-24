@@ -9,3 +9,5 @@ PyMuPDF
 python-dotenv
 supabase
 langchain-openai
+langchain
+langgraph
