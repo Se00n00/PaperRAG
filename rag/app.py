@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 import uuid
 from supabase import create_client, Client
-import psycopg2
 from dotenv import load_dotenv
 import os
 
