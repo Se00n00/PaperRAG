@@ -49,7 +49,7 @@ app.add_middleware(
 #------------------------ ENDPOINT: /
 @app.get("/")
 def home():
-    return {"message:","I will Make it"}
+    return {"message":"I will Make it"}
 
 #------------------------ ENDPOINT: /upsert
 pc = Pinecone(api_key=os.environ.get("PINECONE_APIKEY"))

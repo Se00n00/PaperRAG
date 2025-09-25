@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ArXiv } from './service/ar-xiv';
 import { SementicScholar } from './service/sementic-scholar';
 import { Article } from '../article/article';
+import { AiOutput } from './ai-output/ai-output';
 
 @Component({
   selector: 'app-root',
@@ -12,28 +13,32 @@ import { Article } from '../article/article';
   imports: [
     FormsModule,
     CommonModule,
-    Article
+    Article,
+    AiOutput
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 
 export class App {
+  constructor(private scholar: SementicScholar) {}
   text: WritableSignal<string> = signal('');
-  isTouched = signal(false)
-  timeLeftToSend = signal(10);
   finalQuestion: WritableSignal<string> = signal('');
-  private intervalId: any = null;
 
+  isSearched = signal(false)
+  isTouched = signal(false)
+  
   onUserNameChange(newText: string) {
     this.isTouched.update((val)=>true)
     this.text.set(newText);
     if (this.text().length !== 0) {
-      this.prepareToSend(3);
+      this.prepareToSend(3, this.text(), "keyword");
     }
   }
 
-  prepareToSend(num: number) {
+  timeLeftToSend = signal(10);
+  private intervalId: any = null;
+  prepareToSend(num: number, query:string, type:string) {
     this.timeLeftToSend.set(num);
 
     if (this.intervalId) {
@@ -47,9 +52,17 @@ export class App {
         } else {
           clearInterval(this.intervalId);
           this.intervalId = null;
-          this.finalQuestion.set(this.text())
-          this.isTouched.update((val)=>false)
-          this.search()
+          if(type =="keyword"){
+            this.finalQuestion.set(query)
+            this.isTouched.update((val)=>val = false)
+            this.search()
+            this.text.set("")
+          }else{
+            this.paperLink.set(query)
+            this.searchlinkInput.update((val)=>val = false)
+            this.gotpaper.update((val)=>val=true)
+          }
+          
           return 0;
         }
       });
@@ -61,7 +74,7 @@ export class App {
   currentIndex = signal(0)
   index = 0
 
-  constructor(private arxiv: ArXiv, private scholar: SementicScholar) {}
+  
   search() {
     this.scholar.searchPapers(this.finalQuestion(), 10).subscribe((res: any) => {
       this.scholarPapers.set(res.data)
@@ -77,12 +90,22 @@ export class App {
 
     if (match) {
       const link = match[0];
-      const pdfUrl = link.replace("/abs/", "/pdf/") + ".pdf";
+      const pdfUrl = link.replace("/abs/", "/pdf/");
       return pdfUrl
     } else {
       return null
     }
   }
+  
+  // Paper Link -----------
+  gotpaper = signal(false)
+  paperLink:WritableSignal<string> = signal("")
+  showPaper(paperUrl:any){
+    this.isSearched.set(true)
+    this.paperLink.set(paperUrl)
+    this.gotpaper.update((val)=>val=true)
+  }
+  //---------------------- List of research papers Crousl
   upList(){
     this.currentIndex.update((val)=> (val+1)%this.scholarPapers().length)
     this.currentPaper = this.scholarPapers().at(this.currentIndex())
@@ -95,4 +118,46 @@ export class App {
     })
     this.currentPaper = this.scholarPapers().at(this.currentIndex())
   }
+
+
+  // Search Paper Using PDF Link
+  searchlink:WritableSignal<string> = signal("")
+  searchlinkInput = signal(false)
+  seachUsingLink(){
+    this.searchlinkInput.update((val)=>val=!val)
+  }
+  onSearchLinkChange(link:string){
+    this.searchlink.set(link);
+
+    if (this.searchlink().length !== 0) {
+      this.prepareToSend(3, this.searchlink(),"link");
+    }
+  }
+
+  // New Session----------------------------------------
+  newSession(){
+    
+    this.finalQuestion.set('')
+    this.isSearched.set(false)
+    this.isTouched.set(false)
+
+    this.currentIndex.set(0)
+    this.currentPaper = null
+    this.scholarPapers.set([])
+
+    this.gotpaper.set(false)
+    this.paperLink.set('')
+
+    this.searchlink.set('')
+  }
+
+  isValidUrl(url: string): boolean {
+    try {
+      new URL(url);
+      return true;
+    } catch (_) {
+      return false;
+  }
+}
+
 }
