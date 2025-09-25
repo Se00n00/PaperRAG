@@ -78,7 +78,7 @@ async def chat(query:str):
         config = {"configurable": {"thread_id": "abcd123"}}
         def event_generator():
             for chunk, meta in agentic_rag.stream(
-                {'query':query}, config, stream_mode = "messages"
+                {'messages':query}, config, stream_mode = "messages"
             ):
                 if isinstance(chunk, AIMessage):
                     yield chunk.content

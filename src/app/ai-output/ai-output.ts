@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-ai-output',
@@ -7,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './ai-output.css'
 })
 export class AiOutput {
-
+  @Input() message:string = ''
 }

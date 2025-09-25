@@ -21,7 +21,7 @@ import { AiOutput } from './ai-output/ai-output';
 })
 
 export class App {
-  constructor(private scholar: SementicScholar) {}
+  constructor(private scholar: SementicScholar, private http:HttpClient) {}
   text: WritableSignal<string> = signal('');
   finalQuestion: WritableSignal<string> = signal('');
 
@@ -52,12 +52,16 @@ export class App {
         } else {
           clearInterval(this.intervalId);
           this.intervalId = null;
-          if(type =="keyword"){
+          if(type =="keyword" && !this.isSearched()){
             this.finalQuestion.set(query)
             this.isTouched.update((val)=>val = false)
             this.search()
             this.text.set("")
-          }else{
+          }else if(this.isSearched()){
+            this.queryLLM(query)
+            this.text.set("")
+          }
+          else{
             this.paperLink.set(query)
             this.searchlinkInput.update((val)=>val = false)
             this.gotpaper.update((val)=>val=true)
@@ -157,7 +161,33 @@ export class App {
       return true;
     } catch (_) {
       return false;
+    }
   }
-}
 
+  // ---------------------------------------------------------------- RAG CHAT REQUEST -----------------------------------------------------------
+  message2Component:WritableSignal<string[]> = signal([])
+
+  async queryLLM(prompt: string) {
+    let res = await fetch(`https://paperrag-embedding.onrender.com/chat?query=${encodeURIComponent(prompt)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const reader = res.body?.getReader();
+    const decoder = new TextDecoder();
+    this.message2Component.update(prev => [
+      ...prev, ''
+    ]);
+
+    while (true) {
+      const { done, value } = await reader!.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      
+      this.message2Component.update(prev => {
+        const last = prev[prev.length - 1]
+        return [...prev.slice(0, -1), last + chunk];
+      });
+    }
+  }
 }
