@@ -1,8 +1,9 @@
 import { Component, Input } from '@angular/core';
+import { MarkdownComponent} from 'ngx-markdown'
 
 @Component({
   selector: 'app-ai-output',
-  imports: [],
+  imports: [MarkdownComponent],
   templateUrl: './ai-output.html',
   styleUrl: './ai-output.css'
 })

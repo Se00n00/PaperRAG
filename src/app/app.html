@@ -1,24 +1,35 @@
-<div class="relative flex-1  h-full shadow-md border border-black/[0.4] gap-10 bg-white flex flex-row justify-center items-center rounded-xl p-4"
+<div class="relative flex-1  h-full shadow-md border border-black/[0.4] bg-white  flex flex-col p-10 items-center rounded-xl max-h-screen overflow-scroll"
   [ngClass]="{
     '':scholarPapers().length === 0,
     '':scholarPapers().length > 0
   }">
-  <div class="absolute top-0 w-full flex justify-between p-3">
+  <div class="fixed top-0 w-full flex justify-between p-3">
     <img src="frame.svg" class="h-9 cursor-pointer hover:scale-[0.96] transition-all hover:opacity-85">
   </div>
-  <div class="absolute bottom-3 left-3 flex items-center py-1 px-1.5 pr-3 gap-2 group bg-black/[0.1] shadow rounded-2xl text-xs font-light text-black/[0.7] cursor-pointer hover:bg-black/[0.2] hover:scale-[1.08] transition-all hover:shadow-xl">
+  <div class="fixed z-10 backdrop-blur-md bottom-3 left-3 flex items-center py-1 px-1.5 pr-3 gap-2 group bg-black/[0.1] shadow rounded-2xl text-xs font-light text-black/[0.7] cursor-pointer hover:bg-black/[0.2] hover:scale-[1.08] transition-all hover:shadow-xl">
     <img src="icon/ghost.svg" alt="sign In" class="h-6 hover:scale-[0.96] transition-all hover:opacity-85" title="No User Found">
     Sign In
   </div>
-  <div class="flex-1 flex flex-col h-full justify-center items-center">
-    @if(isSearched()){
+  @if(isSearched()){
+    <div class="">
       @for (item of message2Component(); track $index) {
         <app-ai-output [message]="item"/>
       }
-      
-    }
+      <div #bottom class="h-40"></div>
+    </div>
 
-    @if(currentPaper){
+    <!-- @if(message2Component().length == 0) {
+      <div class="items-start z-10 text-black font-light">Ask Selected Paper</div>
+    } -->
+  }
+  <div class="flex-1 flex flex-col gap-5 items-center"
+  [ngClass]="{
+    'justify-center p-10':isSearched(),
+    'justify-center':!isSearched()
+  }">
+    
+
+    @if(currentPaper && !isSearched()){
       <div class="flex relative justify-center items-center transition-all">
         <div class="flex-1 bg-[#282C31] rounded-xl w-[80vw] sm:w-[70vw] lg:w-[50vw] p-1.5" tabindex="0" (keydown.ArrowUp)="downList()" (keydown.ArrowDown)="upList()">
           <div class="bg-white rounded-lg p-5 flex flex-col gap-5 mb-1.5">
@@ -150,10 +161,11 @@
     </div>
   </div>
 
-  @if (gotpaper()&&paperLink().length > 0 &&isValidUrl(paperLink())) {
-    <div class="flex-1 h-full shadow-md rounded-md">
+  <!-- Extracted Paper  -->
+  <!-- @if (gotpaper()&&paperLink().length > 0 &&isValidUrl(paperLink())) {
+    <div class="flex-[0.4] h-full w-80 p-10 ">
       <app-article [paper_link]="paperLink()"/>
     </div>
   }
-  
+   -->
 </div>

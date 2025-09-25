@@ -1,4 +1,4 @@
-import { Component, signal, WritableSignal } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, signal, ViewChild, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -20,7 +20,7 @@ import { AiOutput } from './ai-output/ai-output';
   styleUrl: './app.css'
 })
 
-export class App {
+export class App implements AfterViewChecked {
   constructor(private scholar: SementicScholar, private http:HttpClient) {}
   text: WritableSignal<string> = signal('');
   finalQuestion: WritableSignal<string> = signal('');
@@ -188,6 +188,16 @@ export class App {
         const last = prev[prev.length - 1]
         return [...prev.slice(0, -1), last + chunk];
       });
+    }
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+  @ViewChild('bottom') bottom!: ElementRef;
+  private scrollToBottom(): void {
+    if (this.bottom) {
+      this.bottom.nativeElement.scrollIntoView({ behavior: 'smooth' });
     }
   }
 }
