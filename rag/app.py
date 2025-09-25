@@ -71,9 +71,11 @@ def add_pdf(pdf_url:str, user_id=Depends(get_user_or_guest)):
     
 #------------------------ ENDPOINT: /chat
 @app.post("/chat")
-async def chat(query:str, user_id=Depends(get_user_or_guest)):
+# async def chat(query:str, user_id=Depends(get_user_or_guest)):
+
+async def chat(query:str):
     try:
-        config = {"configurable": {"thread_id": user_id}}
+        config = {"configurable": {"thread_id": "abcd123"}}
         def event_generator():
             for chunk, meta in agentic_rag.stream(
                 {'query':query}, config, stream_mode = "messages"
