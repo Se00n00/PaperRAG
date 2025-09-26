@@ -7,13 +7,14 @@ import { SementicScholar } from './service/sementic-scholar';
 import { Article } from '../article/article';
 import { AiOutput } from './ai-output/ai-output';
 
+import { Supabase } from './service/authentication/supabase';
+
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     FormsModule,
     CommonModule,
-    Article,
     AiOutput
   ],
   templateUrl: './app.html',
@@ -21,7 +22,7 @@ import { AiOutput } from './ai-output/ai-output';
 })
 
 export class App implements AfterViewChecked {
-  constructor(private scholar: SementicScholar, private http:HttpClient) {}
+  constructor(private scholar: SementicScholar, private http:HttpClient, public auth:Supabase) {}
   text: WritableSignal<string> = signal('');
   finalQuestion: WritableSignal<string> = signal('');
 

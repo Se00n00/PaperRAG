@@ -3,12 +3,25 @@
     '':scholarPapers().length === 0,
     '':scholarPapers().length > 0
   }">
-  <div class="fixed top-0 w-full flex justify-between p-3">
+  <div class="fixed top-0 w-full flex items-center gap-2 p-3 text-black">
     <img src="frame.svg" class="h-9 cursor-pointer hover:scale-[0.96] transition-all hover:opacity-85">
+    Ask Paper
   </div>
-  <div class="fixed z-10 backdrop-blur-md bottom-3 left-3 flex items-center py-1 px-1.5 pr-3 gap-2 group bg-black/[0.1] shadow rounded-2xl text-xs font-light text-black/[0.7] cursor-pointer hover:bg-black/[0.2] hover:scale-[1.08] transition-all hover:shadow-xl">
-    <img src="icon/ghost.svg" alt="sign In" class="h-6 hover:scale-[0.96] transition-all hover:opacity-85" title="No User Found">
-    Sign In
+  <div class="fixed z-10 bottom-5 left-5">
+    
+    @if(auth.sessions && auth.sessions.user.is_anonymous){
+      <div (click)="auth.sign_in_oauth()" class="backdrop-blur-md  flex items-center py-1 px-1.5 pr-3 gap-2 group bg-black/[0.1] shadow rounded-2xl text-xs font-light text-black/[0.7] cursor-pointer hover:bg-black/[0.2] hover:scale-[1.08] transition-all hover:shadow-xl">
+        <img src="icon/ghost.svg" alt="sign In" class="h-6 hover:scale-[0.96] transition-all hover:opacity-85" title="No User Found">
+        Sign In
+      </div>
+    }@else {
+      <div (click)="auth.sign_out()" class="backdrop-blur-md  flex items-center py-1 px-1.5 pr-3 gap-2 group bg-black/[0.1] shadow rounded-2xl text-xs font-light text-black/[0.7] cursor-pointer hover:bg-black/[0.2] hover:scale-[1.08] transition-all hover:shadow-xl">
+        <img [src]="auth.data()?.user.user_metadata.avatar_url" alt="sign In" class="rounded-full h-6 hover:scale-[0.96] transition-all hover:opacity-85" title="No User Found">
+        Sign Out
+      </div>
+    }
+    
+    
   </div>
   @if(isSearched()){
     <div class="">
