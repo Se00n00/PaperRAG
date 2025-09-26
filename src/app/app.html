@@ -16,7 +16,7 @@
       </div>
     }@else {
       <div (click)="auth.sign_out()" class="backdrop-blur-md  flex items-center py-1 px-1.5 pr-3 gap-2 group bg-black/[0.1] shadow rounded-2xl text-xs font-light text-black/[0.7] cursor-pointer hover:bg-black/[0.2] hover:scale-[1.08] transition-all hover:shadow-xl">
-        <img [src]="auth.data()?.user.user_metadata.avatar_url" alt="sign In" class="rounded-full h-6 hover:scale-[0.96] transition-all hover:opacity-85" title="No User Found">
+        <img [src]="auth.data()?.user.user_metadata.avatar_url" alt="user" class="rounded-full h-6 hover:scale-[0.96] transition-all hover:opacity-85" title="No User Found">
         Sign Out
       </div>
     }

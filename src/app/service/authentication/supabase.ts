@@ -48,7 +48,7 @@ export class Supabase {
     const {data, error} = await this.supabase.auth.signInWithOAuth({
       provider:'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: import.meta.env.NG_APP_REDIRECT,
       }
     })
 
