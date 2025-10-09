@@ -14,7 +14,63 @@ export class Supabase {
 
   constructor(){
     this.load_session()
+    this.insert_session()
   }
+
+  async insert_session() {
+    const { data: { user } } = await this.supabase.auth.getUser();
+
+    const { data: insert_data, error } = await this.supabase
+      .from("chat_sessions")
+      .insert({ user_id: user?.id ?? null })
+      .select("thread_id")
+      .single()
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const threadId = insert_data.thread_id;
+
+    const { error: msgError } = await this.supabase
+      .from("chat_messages")
+      .insert({
+        thread_id: threadId
+      });
+
+    if (msgError) console.error(msgError);
+  }
+
+  async getCurrentThread() {
+    const { data: { user } } = await this.supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data, error } = await this.supabase
+      .from("chat_sessions")
+      .select("thread_id, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    if (!data || data.length === 0) {
+      console.log("No current thread exists");
+      return null;
+    }
+
+    const threadId = data[0].thread_id; // <-- the actual UUID string
+    console.log("THREAD ID:", threadId);
+    return threadId;
+  }
+
+
+
+
   async load_session(){
     const {data} = await this.supabase.auth.getSession()
     let session = data.session

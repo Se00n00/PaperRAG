@@ -1,4 +1,4 @@
-from Utils.get_pdf_contents import get_pdf_content
+from Utils.get_pdf_contents import get_papers, get_pdf_content
 from Node.agents import agentic_rag
 from fastapi import FastAPI, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,12 +46,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#------------------------ ENDPOINT: /
+#------------------------------------------------- ENDPOINT: /
 @app.get("/")
 def home():
     return {"message":"I will Make it"}
 
-#------------------------ ENDPOINT: /upsert
+#------------------------------------------------- ENDPOINT: /get_papers
+class Url_request(BaseModel):
+    url:str
+
+@app.get("/get_papers")
+def home(request:Url_request):
+    return {"response":get_papers(request.url)}
+
+#-------------------------------------------------- ENDPOINT: /upsert
 pc = Pinecone(api_key=os.environ.get("PINECONE_APIKEY"))
 index = pc.Index(host=os.environ.get("UNSIGNED_HOST"))
 
@@ -70,6 +78,7 @@ def add_pdf(pdf_url:str, user_id=Depends(get_user_or_guest)):
         return {"error":f"Content's Didn't Upserted Exception: {e}"}
     
 #------------------------ ENDPOINT: /chat
+
 @app.post("/chat")
 # async def chat(query:str, user_id=Depends(get_user_or_guest)):
 

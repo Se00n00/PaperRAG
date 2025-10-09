@@ -28,13 +28,22 @@ export class App implements AfterViewChecked {
 
   isSearched = signal(false)
   isTouched = signal(false)
+
+  thread_id: any
+
+  showauthors = signal(false)
   
   onUserNameChange(newText: string) {
     this.isTouched.update((val)=>true)
     this.text.set(newText);
     if (this.text().length !== 0) {
-      this.prepareToSend(3, this.text(), "keyword");
+      this.prepareToSend(3, this.text(), "paper");
     }
+  }
+
+  get_thread_id(){
+    console.log("THREAD ID:", this.auth.getCurrentThread())
+    this.thread_id = this.auth.getCurrentThread()
   }
 
   timeLeftToSend = signal(10);
@@ -53,20 +62,23 @@ export class App implements AfterViewChecked {
         } else {
           clearInterval(this.intervalId);
           this.intervalId = null;
-          if(type =="keyword" && !this.isSearched()){
-            this.finalQuestion.set(query)
-            this.isTouched.update((val)=>val = false)
-            this.search()
-            this.text.set("")
-          }else if(this.isSearched()){
-            this.queryLLM(query)
-            this.text.set("")
-          }
-          else{
-            this.paperLink.set(query)
-            this.searchlinkInput.update((val)=>val = false)
-            this.gotpaper.update((val)=>val=true)
-          }
+
+          this.finalQuestion.set(query)
+          this.isTouched.update((val)=>val = false)
+          this.search(type)
+          this.text.set("")
+
+          // if(type =="keyword" && !this.isSearched()){
+            
+          // }else if(this.isSearched()){
+          //   this.queryLLM(query)
+          //   this.text.set("")
+          // }
+          // else{
+          //   this.paperLink.set(query)
+          //   this.searchlinkInput.update((val)=>val = false)
+          //   this.gotpaper.update((val)=>val=true)
+          // }
           
           return 0;
         }
@@ -79,28 +91,25 @@ export class App implements AfterViewChecked {
   currentIndex = signal(0)
   index = 0
 
-  
-  search() {
-    this.scholar.searchPapers(this.finalQuestion(), 10).subscribe((res: any) => {
-      this.scholarPapers.set(res.data)
-      if(res.data.length > 0){
-        this.currentPaper = res.data[this.currentIndex()]
-      }
+  // ----------------------- Search for List of research papers
+  async search(endpoint:string) {
+    let res = await fetch(`${import.meta.env.NG_APP_PAPERS_BACKEND}/${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: this.finalQuestion() })
     });
-
-  }
-
-  getlink(text:string){
-    const match = text.match(/https?:\/\/[^\s,]+/);
-
-    if (match) {
-      const link = match[0];
-      const pdfUrl = link.replace("/abs/", "/pdf/");
-      return pdfUrl
-    } else {
-      return null
+    let data = await res.json();
+    this.scholarPapers.set(data['search_results'])
+    if(data['search_results'].length > 0){
+      this.currentPaper = data['search_results'][this.currentIndex()]
     }
+    console.log(data)
+    
+    console.log("Fetched Papers List");
   }
+
+
+
   
   // Paper Link -----------
   gotpaper = signal(false)
@@ -135,11 +144,11 @@ export class App implements AfterViewChecked {
     this.searchlink.set(link);
 
     if (this.searchlink().length !== 0) {
-      this.prepareToSend(3, this.searchlink(),"link");
+      this.prepareToSend(3, this.searchlink(),"paper_using_link");
     }
   }
 
-  // New Session----------------------------------------
+  // ---------------------------------------------------------------- New Session----------------------------------------
   newSession(){
     
     this.finalQuestion.set('')
@@ -195,6 +204,7 @@ export class App implements AfterViewChecked {
   ngAfterViewChecked() {
     this.scrollToBottom();
   }
+
   @ViewChild('bottom') bottom!: ElementRef;
   private scrollToBottom(): void {
     if (this.bottom) {
