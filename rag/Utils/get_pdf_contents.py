@@ -1,49 +1,6 @@
 import re
 import fitz
 import requests
-from semanticscholar import SemanticScholar
-
-sch = SemanticScholar()
-
-def get_link(text: str) -> str:
-    match = re.search(r'https?://[^\s,]+', text)
-    
-    if match:
-        link = match.group(0)
-        pdf_url = link.replace("/abs/", "/pdf/")
-        return pdf_url
-    else:
-        return None
-    
-def get_papers(query:str):
-    result = []
-    try:
-        response = sch.search_paper(query=query,limit=100)
-        
-        for item in response.items:
-            names = [i['name'] for i in item["authors"]]
-            authors = ", ".join(names)
-            
-
-            if (item['openAccessPdf']["url"] == "" and 'disclaimer' in item['openAccessPdf'].keys()):
-                url = get_link(item['openAccessPdf']["disclaimer"])
-            else:
-                url = item['openAccessPdf']["url"]
-                
-            result.append(
-                {
-                    "urls":item["externalIds"],
-                    "pdfs":url,
-                    "year":item['year'],
-                    "authors":authors,
-                    "title":item['title'],
-                    "abstract":item['abstract']
-                }
-            )
-    except Exception as e:
-        print(f"Error: {e}")
-    
-    return {"search_results":result}
 
 def get_pdf_content(pdf_url:str):
     """

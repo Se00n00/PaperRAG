@@ -1,4 +1,5 @@
-from Utils.get_pdf_contents import get_papers, get_pdf_content
+# from Utils.get_pdf_contents import get_pdf_content
+from Utils.get_papers import get_papers, get_paper
 from Node.agents import agentic_rag
 from fastapi import FastAPI, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -51,31 +52,35 @@ app.add_middleware(
 def home():
     return {"message":"I will Make it"}
 
-#------------------------------------------------- ENDPOINT: /get_papers
+#------------------------------------------------- ENDPOINT: /papers + /paper
 class Url_request(BaseModel):
-    url:str
+    query:str
 
-@app.get("/get_papers")
-def home(request:Url_request):
-    return {"response":get_papers(request.url)}
+@app.post("/papers")
+def papers(request:Url_request):
+    return get_papers(request.query)
+
+@app.post("/paper")
+def paper(request:Url_request):
+    return get_paper(request.query)
 
 #-------------------------------------------------- ENDPOINT: /upsert
 pc = Pinecone(api_key=os.environ.get("PINECONE_APIKEY"))
 index = pc.Index(host=os.environ.get("UNSIGNED_HOST"))
 
-@app.post("/upsert")
-def add_pdf(pdf_url:str, user_id=Depends(get_user_or_guest)):
-    try:
-        content = get_pdf_content(pdf_url)
-        index.upsert(
-            vectors=[
-                {"values": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]},
-                {"values": [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]}
-            ],
-            namespace=user_id
-            )
-    except Exception as e:
-        return {"error":f"Content's Didn't Upserted Exception: {e}"}
+# @app.post("/upsert")
+# def add_pdf(pdf_url:str, user_id=Depends(get_user_or_guest)):
+#     try:
+#         content = get_pdf_content(pdf_url)
+#         index.upsert(
+#             vectors=[
+#                 {"values": [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]},
+#                 {"values": [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2]}
+#             ],
+#             namespace=user_id
+#             )
+#     except Exception as e:
+#         return {"error":f"Content's Didn't Upserted Exception: {e}"}
     
 #------------------------ ENDPOINT: /chat
 

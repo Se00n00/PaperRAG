@@ -8,6 +8,11 @@ import { Article } from '../article/article';
 import { AiOutput } from './ai-output/ai-output';
 
 import { Supabase } from './service/authentication/supabase';
+interface Message{
+  type: string
+  heading: string | null
+  content: string
+}
 
 @Component({
   selector: 'app-root',
@@ -26,7 +31,7 @@ export class App implements AfterViewChecked {
   text: WritableSignal<string> = signal('');
   finalQuestion: WritableSignal<string> = signal('');
 
-  isSearched = signal(false)
+  isSearched = signal(true)
   isTouched = signal(false)
 
   thread_id: any
@@ -175,9 +180,22 @@ export class App implements AfterViewChecked {
   }
 
   // ---------------------------------------------------------------- RAG CHAT REQUEST -----------------------------------------------------------
-  message2Component:WritableSignal<string[]> = signal([])
+  message2Component:WritableSignal<Message[]> = signal([
+    {type:"USER", heading:null, content:"Hii! **Hello**"},
+    {type:"ASSISTANT", heading:"Introduction", content:"### Hello! how may i help you ?"},
+    {type:"SYSTEM", heading:"Error", content:"Somthing just happened!"}
+  ])
 
   async queryLLM(prompt: string) {
+    this.message2Component.update(prev => [
+      ...prev,
+      {type:"USER", heading:null, content:prompt}
+    ]);
+    this.message2Component.update(prev => [
+      ...prev,
+      {type:"ASSISTANT", heading:"", content:""}
+    ]);
+
     let res = await fetch(`https://paperrag-embedding.onrender.com/chat?query=${encodeURIComponent(prompt)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" }
@@ -185,19 +203,45 @@ export class App implements AfterViewChecked {
 
     const reader = res.body?.getReader();
     const decoder = new TextDecoder();
-    this.message2Component.update(prev => [
-      ...prev, ''
-    ]);
+    if (!reader) return;
 
-    while (true) {
-      const { done, value } = await reader!.read();
-      if (done) break;
-      const chunk = decoder.decode(value, { stream: true });
-      
-      this.message2Component.update(prev => {
-        const last = prev[prev.length - 1]
-        return [...prev.slice(0, -1), last + chunk];
-      });
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk.trim()) continue;
+
+        // Try to handle JSON chunks or plain text
+        let textChunk = chunk;
+        try {
+          const parsed = JSON.parse(chunk);
+          textChunk = parsed.content ?? chunk;
+        } catch {
+          // not JSON, just text — that’s fine
+        }
+
+        this.message2Component.update(prev => {
+          const updated = [...prev];
+          const lastIndex = updated.length - 1;
+
+          if (updated[lastIndex].type === "assistant") {
+            updated[lastIndex] = {
+              ...updated[lastIndex],
+              heading: updated[lastIndex].heading + textChunk,
+              content: updated[lastIndex].content + textChunk
+            };
+          }
+
+          return updated;
+        });
+      }
+    } catch (err) {
+      this.message2Component.update(prev => [
+        ...prev,
+        { type: "SYSTEM", heading: "Error", content: String(err)}
+      ]);
     }
   }
 

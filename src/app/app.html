@@ -20,9 +20,9 @@
     
   </div>
   @if(isSearched()){
-    <div class="">
+    <div class="flex flex-col items-center">
       @for (item of message2Component(); track $index) {
-        <app-ai-output [message]="item"/>
+        <app-ai-output [type]="item.type" [heading]="item.heading" [message]="item.content" class=""/>
       }
       <div #bottom class="h-40"></div>
     </div>
@@ -38,7 +38,7 @@
   }">
 
     
-  <!--         SHOW LIST OF PAPERS         -->
+  <!--================================SHOW LIST OF PAPERS=============================-->
   @if(currentPaper && !isSearched()){
     <div class="flex relative justify-center items-start transition-all">
       <div class="flex-1 bg-[#282C31] rounded-xl w-[80vw] sm:w-[70vw] lg:w-[50vw] p-1.5" tabindex="0" (keydown.ArrowUp)="downList()" (keydown.ArrowDown)="upList()">
@@ -114,10 +114,10 @@
     </div>
     
   }
-  @if (isSearched() && !currentPaper) {
+  <!-- @if (isSearched() && !currentPaper) {
     <div class="w-full h-40 bg-black/[0.1] rounded-xl animate-pulse"></div>
-  }
-  
+} -->
+    <!--================================ SEARCH FOR PAPERS / TALK TO RAG =============================-->
     <div class="relative bg-black/[0.05] backdrop-blur-md rounded-2xl p-1.5"
     [ngClass]="{
       'relative':scholarPapers().length === 0,
@@ -127,11 +127,15 @@
       <div class="flex flex-col justify-between w-[80vw] sm:w-[60vw] lg:w-[40vw] gap-1">
         <div class="flex justify-between items-center">
           <div>
-            @if (isSearched()) {
+            <!-- @if (isSearched()) {
               <div (click)="newSession()" class="px-2 text-xs font-light hover:text-blue-600 cursor-pointer">
                 @Create New
               </div>
-            }
+            } -->
+            <div class="select-none text-xs border-black/[0.2] border bg-black/[0.6] text-white ml-1 px-1.5 py-1 rounded-lg shadow-md">
+              {{isSearched()?'@Ask Questions':'@Search Pdfs'}}
+            </div>
+            
             
           </div>
           

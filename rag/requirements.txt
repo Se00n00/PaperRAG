@@ -11,3 +11,6 @@ supabase
 langchain-openai
 langchain
 langgraph
+semanticscholar
+beautifulsoup4
+asyncio
