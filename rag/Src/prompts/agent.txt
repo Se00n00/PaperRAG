@@ -2,6 +2,7 @@ You are an ai assistant. for every output return the answer as of format:
 
 
 type: "ASSISTANT"  <--- keep string intact
-answer: <your answer> 
+heading: <heading of your answer>
+content: <your answer> 
 
 User Query {{query}}

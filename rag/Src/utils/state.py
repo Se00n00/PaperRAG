@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
 class GenerativeModel(BaseModel):
-    type:str
-    answer:str
+    type: str
+    heading: str
+    answer: str

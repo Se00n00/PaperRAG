@@ -40,7 +40,7 @@ def model(state: MessagesState):
     writer = get_stream_writer()
     try:
         response = structured_llm.invoke(
-                prompt_template.invoke({"query":state['messages']}).to_messages()
+            prompt_template.invoke({"query":state['messages']}).to_messages()
         )
         return {"messages": response.answer}
     except Exception as e:
