@@ -1,6 +1,6 @@
 # from Utils.get_pdf_contents import get_pdf_content
 from Utils.get_papers import get_papers, get_paper
-from Node.agents import agentic_rag
+from Src.agents import agentic_rag
 from fastapi import FastAPI, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -83,20 +83,22 @@ index = pc.Index(host=os.environ.get("UNSIGNED_HOST"))
 #         return {"error":f"Content's Didn't Upserted Exception: {e}"}
     
 #------------------------ ENDPOINT: /chat
+class RequestModel(BaseModel):
+    query: str
 
 @app.post("/chat")
-# async def chat(query:str, user_id=Depends(get_user_or_guest)):
-
-async def chat(query:str):
+async def chat(request: RequestModel):
+    query = request.query
     try:
         config = {"configurable": {"thread_id": "abcd123"}}
+
         def event_generator():
             for chunk, meta in agentic_rag.stream(
-                {'messages':query}, config, stream_mode = "messages"
+                {'messages': query}, config, stream_mode="messages"
             ):
                 if isinstance(chunk, AIMessage):
                     yield chunk.content
-        
+
         return StreamingResponse(event_generator(), media_type='text/plain')
     except Exception as e:
-        return {"error":f"Exception: {e}"}
+        return {"ERROR": f"Exception: {e}"}

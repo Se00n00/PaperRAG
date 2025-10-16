@@ -84,6 +84,7 @@ export class Supabase {
     }
     this.sessions = session
     this.data.set(session);
+    console.log(session)
 
     this.supabase.auth.onAuthStateChange((_event,newsession)=>{
       this.sessions = newsession
