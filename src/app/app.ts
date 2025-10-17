@@ -70,7 +70,8 @@ export class App implements AfterViewChecked {
 
           this.finalQuestion.set(query)
           this.isTouched.update((val)=>val = false)
-          this.search(type)
+          this.queryLLM(this.text())
+          // this.search(type)
           this.text.set("")
 
           // if(type =="keyword" && !this.isSearched()){
@@ -183,7 +184,7 @@ export class App implements AfterViewChecked {
   message2Component:WritableSignal<Message[]> = signal([
     {type:"USER", heading:null, content:"Hii! **Hello**"},
     {type:"ASSISTANT", heading:"Introduction", content:"### Hello! how may i help you ?"},
-    {type:"SYSTEM", heading:"Error", content:"Somthing just happened!"}
+    {type:"SYSTEM", heading:"Error", content:"Something just happened!"}
   ])
 
   async queryLLM(prompt: string) {
@@ -191,14 +192,11 @@ export class App implements AfterViewChecked {
       ...prev,
       {type:"USER", heading:null, content:prompt}
     ]);
-    this.message2Component.update(prev => [
-      ...prev,
-      {type:"ASSISTANT", heading:"", content:""}
-    ]);
-
-    let res = await fetch(`https://paperrag-embedding.onrender.com/chat?query=${encodeURIComponent(prompt)}`, {
+    
+    let res = await fetch("https://paperrag-ut04.onrender.com/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: prompt })
     });
 
     const reader = res.body?.getReader();
@@ -206,6 +204,11 @@ export class App implements AfterViewChecked {
     if (!reader) return;
 
     try {
+      this.message2Component.update(prev => [
+        ...prev,
+        {type:"ASSISTANT", heading:"", content:""}
+      ]);
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -213,36 +216,52 @@ export class App implements AfterViewChecked {
         const chunk = decoder.decode(value, { stream: true });
         if (!chunk.trim()) continue;
 
-        // Try to handle JSON chunks or plain text
-        let textChunk = chunk;
+        let data;
         try {
-          const parsed = JSON.parse(chunk);
-          textChunk = parsed.content ?? chunk;
+          data = JSON.parse(chunk);
         } catch {
-          // not JSON, just text — that’s fine
+          console.warn("Non-JSON chunk:", chunk);
+          continue;
         }
 
-        this.message2Component.update(prev => {
-          const updated = [...prev];
-          const lastIndex = updated.length - 1;
+        if (data.type === "ASSISTANT") {
+          this.message2Component.update(prev => {
+            const updated = [...prev];
+            const lastIndex = updated.length - 1;
 
-          if (updated[lastIndex].type === "assistant") {
-            updated[lastIndex] = {
-              ...updated[lastIndex],
-              heading: updated[lastIndex].heading + textChunk,
-              content: updated[lastIndex].content + textChunk
-            };
-          }
+            if (updated[lastIndex]?.type === "ASSISTANT") {
+              // Append new content to the last assistant message
+              updated[lastIndex] = {
+                ...updated[lastIndex],
+                heading: data.heading ?? updated[lastIndex].heading,
+                content:
+                  (updated[lastIndex].content || "") +
+                  (data.answer ?? "")
+              };
+            } else {
+              updated.push({
+                type: "ASSISTANT",
+                heading: data.heading ?? "Response",
+                content: data.answer ?? ""
+              });
+            }
 
-          return updated;
-        });
+            return updated;
+          });
+        } else if (data.type === "SYSTEM") {
+          this.message2Component.update(prev => [
+            ...prev,
+            { type: "SYSTEM", heading: "System Message", content: data.answer ?? "" }
+          ]);
+        }
       }
     } catch (err) {
       this.message2Component.update(prev => [
         ...prev,
-        { type: "SYSTEM", heading: "Error", content: String(err)}
+        { type: "SYSTEM", heading: "Error", content: String(err) }
       ]);
     }
+
   }
 
   ngAfterViewChecked() {
