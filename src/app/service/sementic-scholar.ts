@@ -11,7 +11,7 @@ export class SementicScholar {
   constructor(private http: HttpClient) {}
 
   searchPapers(query: string, limit: number = 5): Observable<any> {
-    const url = `${this.baseUrl}/paper/search?query=${encodeURIComponent(query)}&limit=${limit}&fields=title,authors,year,abstract`;
+    const url = `${this.baseUrl}/paper/search?query=${encodeURIComponent(query)}&limit=${limit}&fields=title,authors,year,abstract,externalIds`;
     return this.http.get(url);
   }
 }

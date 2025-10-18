@@ -1,0 +1,78 @@
+<div class="flex relative justify-center items-start transition-all">
+    <div class="flex-1 bg-[#282C31] rounded-xl w-[80vw] sm:w-[70vw] lg:w-[50vw] p-1.5" tabindex="0" (keydown.ArrowUp)="downList()" (keydown.ArrowDown)="upList()">
+        <div class="bg-white rounded-lg p-5 flex flex-col gap-5 mb-1.5">
+            <div class="font-light hidden md:text-xl text-black/[0.4]">
+            {{currentPaper.paperId}}
+            </div>
+            
+            <!-- TITLE & YEAR  -->
+            <div class="flex justify-between text-xl items-start">
+                {{currentPaper.title}}
+                <div class="font-light text-sm text-black/[0.5]">
+                    {{currentPaper.year}}
+                </div>
+            </div>
+            <div class="flex text-xs text-black bg-black/[0.1] font-light p-1 gap-1 rounded-lg w-fit flex-wrap"> 
+                <div *ngFor="let item of currentPaper.externalIds | keyvalue" class="bg-white rounded-md p-1 px-2 shadow text-nowrap">
+                    {{item.value}}
+                </div>
+            </div>
+            
+            <!-- AUTHORS NAME  -->
+            <div class="flex flex-col gap-1 text-sm font-light">
+                Authors
+                @if(showauthors()){
+                <div class="text-xs text-black/[0.5] cursor-pointer" (click)="showauthors.set(false)">
+                    @for(item of currentPaper.authors; track $index){
+                    {{item.name}}
+                    }
+                </div>
+                }@else {
+                <div class="text-xs text-black/[0.5] cursor-pointer" (click)="showauthors.set(true)">
+                    @for(item of currentPaper.authors.slice(0,7); track $index){
+                    {{item.name}}
+                    }
+                </div>
+                }
+            </div>
+
+            <!-- ABSTRACT OF PAPER  -->
+            <div class="flex font-light text-sm">
+                {{currentPaper.abstract}}
+            </div>
+        </div>
+        <div class="flex justify-between items-center p-2 select-none">
+            <div class="flex gap-2">
+            @if(currentPaper.pdf){
+                <a [href]="currentPaper.pdf">
+                <div class="hover:bg-white/[0.1] p-1 rounded-md border border-transparent hover:border-white/[0.1] text-white text-xs transition-all">
+                    <img src="icon/clip.svg" class="h-4">
+                </div>
+                </a>
+            }
+            <div class="hover:bg-white/[0.1] p-1 rounded-md border border-transparent hover:border-white/[0.1] transition-all">
+                <img (click)="downList()" src="icon/arrow.svg" class="h-4">
+            </div>
+            <div class="hover:bg-white/[0.1] p-1 rounded-md border border-transparent hover:border-white/[0.1] transition-all">
+                <img (click)="upList()" src="icon/arrow.svg" class="h-4 rotate-180">
+            </div>
+            </div>
+            @if(currentPaper.pdf){
+            <div class="bg-white/[0.1] text-white border border-white/[0.1] text-xs p-1 px-2 rounded-md flex items-center gap-1.5 hover:scale-[1.05] transition-all cursor-pointer">
+                Ask AI 
+                <img src="icon/sparkles.svg" class="h-4">
+            </div>
+            }
+            
+        </div>
+        </div>
+        <div class="w-max absolute -right-5 sm:-right-10 flex flex-col items-center">
+        @for (item of scholarPapers; track $index) {
+            <div class="h-0.5"
+            [ngClass]="{
+                'bg-black w-4 my-1.5': $index == currentIndex(),
+                'bg-black/[0.2] w-3 my-1': $index != currentIndex()
+            }"></div>
+        }
+        </div>
+    </div>

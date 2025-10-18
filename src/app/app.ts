@@ -6,7 +6,7 @@ import { ArXiv } from './service/ar-xiv';
 import { SementicScholar } from './service/sementic-scholar';
 import { Article } from '../article/article';
 import { AiOutput } from './ai-output/ai-output';
-
+import { Papers } from './papers/papers';
 import { Supabase } from './service/authentication/supabase';
 interface Message{
   type: string
@@ -20,7 +20,8 @@ interface Message{
   imports: [
     FormsModule,
     CommonModule,
-    AiOutput
+    AiOutput,
+    Papers
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'
@@ -31,7 +32,7 @@ export class App implements AfterViewChecked {
   text: WritableSignal<string> = signal('');
   finalQuestion: WritableSignal<string> = signal('');
 
-  isSearched = signal(true)
+  isSearched = signal(false)
   isTouched = signal(false)
 
   thread_id: any
@@ -70,8 +71,8 @@ export class App implements AfterViewChecked {
 
           this.finalQuestion.set(query)
           this.isTouched.update((val)=>val = false)
-          this.queryLLM(this.text())
-          // this.search(type)
+          // this.queryLLM(this.text())
+          this.search(this.text())
           this.text.set("")
 
           // if(type =="keyword" && !this.isSearched()){
@@ -93,25 +94,22 @@ export class App implements AfterViewChecked {
   }
 
   scholarPapers: WritableSignal<any[]> = signal([])
-  currentPaper:any
-  currentIndex = signal(0)
-  index = 0
+  currentPaper: any
 
-  // ----------------------- Search for List of research papers
-  async search(endpoint:string) {
-    let res = await fetch(`${import.meta.env.NG_APP_PAPERS_BACKEND}/${endpoint}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: this.finalQuestion() })
+  // ---------------------------------------------- Search for List of research papers
+  async search(query:string) {
+    this.scholar.searchPapers(query, 5).subscribe({
+      next: (data) => {
+        console.log(data.data)
+        this.scholarPapers.set(data.data)
+        if(data.data.length > 0){
+          this.currentPaper = data.data[0]
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching papers:', err);
+      },
     });
-    let data = await res.json();
-    this.scholarPapers.set(data['search_results'])
-    if(data['search_results'].length > 0){
-      this.currentPaper = data['search_results'][this.currentIndex()]
-    }
-    console.log(data)
-    
-    console.log("Fetched Papers List");
   }
 
 
@@ -124,19 +122,6 @@ export class App implements AfterViewChecked {
     this.isSearched.set(true)
     this.paperLink.set(paperUrl)
     this.gotpaper.update((val)=>val=true)
-  }
-  //---------------------- List of research papers Crousl
-  upList(){
-    this.currentIndex.update((val)=> (val+1)%this.scholarPapers().length)
-    this.currentPaper = this.scholarPapers().at(this.currentIndex())
-    this.index = this.currentIndex()
-  }
-  downList() {
-    this.currentIndex.update(val => {
-      const len = this.scholarPapers().length
-      return (val - 1 + len) % len
-    })
-    this.currentPaper = this.scholarPapers().at(this.currentIndex())
   }
 
 
@@ -160,8 +145,6 @@ export class App implements AfterViewChecked {
     this.finalQuestion.set('')
     this.isSearched.set(false)
     this.isTouched.set(false)
-
-    this.currentIndex.set(0)
     this.currentPaper = null
     this.scholarPapers.set([])
 
