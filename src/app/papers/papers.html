@@ -43,11 +43,19 @@
         </div>
         <div class="flex justify-between items-center p-2 select-none">
             <div class="flex gap-2">
-            @if(currentPaper.pdf){
-                <a [href]="currentPaper.pdf">
+            @if(currentPaper.openAccessPdf["url"]){
+                <a [href]="currentPaper.openAccessPdf['url']">
                 <div class="hover:bg-white/[0.1] p-1 rounded-md border border-transparent hover:border-white/[0.1] text-white text-xs transition-all">
                     <img src="icon/clip.svg" class="h-4">
                 </div>
+                </a>
+            }
+            @else{
+                
+                <a [href]="GetPdfLink(currentPaper.openAccessPdf['disclaimer'])">
+                    <div class="hover:bg-white/[0.1] p-1 rounded-md border border-transparent hover:border-white/[0.1] text-white text-xs transition-all">
+                        <img src="icon/clip.svg" class="h-4">
+                    </div>
                 </a>
             }
             <div class="hover:bg-white/[0.1] p-1 rounded-md border border-transparent hover:border-white/[0.1] transition-all">
@@ -57,11 +65,16 @@
                 <img (click)="upList()" src="icon/arrow.svg" class="h-4 rotate-180">
             </div>
             </div>
-            @if(currentPaper.pdf){
-            <div class="bg-white/[0.1] text-white border border-white/[0.1] text-xs p-1 px-2 rounded-md flex items-center gap-1.5 hover:scale-[1.05] transition-all cursor-pointer">
-                Ask AI 
-                <img src="icon/sparkles.svg" class="h-4">
-            </div>
+            @if(currentPaper.openAccessPdf["url"]){
+                <div class="bg-white/[0.1] text-white border border-white/[0.1] text-xs p-1 px-2 rounded-md flex items-center gap-1.5 hover:scale-[1.05] transition-all cursor-pointer">
+                    Ask AI 
+                    <img src="icon/sparkles.svg" class="h-4">
+                </div>
+            }@else{
+                <div class="bg-white/[0.1] text-white border border-white/[0.1] text-xs p-1 px-2 rounded-md flex items-center gap-1.5 hover:scale-[1.05] transition-all cursor-pointer">
+                    Ask AI 
+                    <img src="icon/sparkles.svg" class="h-4">
+                </div>
             }
             
         </div>

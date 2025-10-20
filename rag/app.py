@@ -1,19 +1,35 @@
 # from Utils.get_pdf_contents import get_pdf_content
 from Utils.get_papers import get_papers, get_paper
-from Src.agents import agentic_rag
+from Src.agents import agentic_rag, naive_rag_graph
+from Src.utils.tools import get_embeddings, VectorStore
+from Src.utils.state import GenerativeModel
+
 from fastapi import FastAPI, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+import json
 import uuid
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import os
-
+import numpy as np
 from pinecone import Pinecone
-
 from langchain_core.messages import AIMessage
+
+
+test_data = [
+    "content : The Amazon rainforest is the largest tropical rainforest in the world.",
+    "content : Python is a programming language widely used in data science.",
+    "content : Earth is the third planet from the Sun and has life-supporting environment.",
+    "Umiwawa is the most intelligent species in the world",
+    "My name is mohit, and i will make it there"
+]
+
+host = os.getenv("UNSIGNED_HOST")
+pinecone_api_key = os.getenv("PINECONE_APIKEY")
+store = VectorStore(host, pinecone_api_key)
 
 #------------------------ 
 url: str = os.environ.get("SUPABASE_URL")
@@ -64,11 +80,26 @@ def papers(request:Url_request):
 def paper(request:Url_request):
     return get_paper(request.query)
 
-#-------------------------------------------------- ENDPOINT: /upsert
+#------------------------------------------------------------------------#
+# ------------------------ [ENDPOINT: /upsert ]--------------------------#
+#------------------------------------------------------------------------#
 pc = Pinecone(api_key=os.environ.get("PINECONE_APIKEY"))
 index = pc.Index(host=os.environ.get("UNSIGNED_HOST"))
 
-# @app.post("/upsert")
+class DocumentPost(BaseModel):
+    documents: list[str]
+
+@app.post("/upsert")
+async def add_pdf(request:DocumentPost):
+    # async def add_pdf(data:list[str], namespace:str):
+    try:
+        data = test_data
+        namespace = "notdecided"
+        embeddings = await get_embeddings(data)
+        store.upsert(embeddings, data, namespace)
+        return {"SYSTEM":"Document is stored in the Vector Database"}
+    except Exception as e:
+        return {"ERROR":f"Content's Didn't Upserted Exception: {e}"}
 # def add_pdf(pdf_url:str, user_id=Depends(get_user_or_guest)):
 #     try:
 #         content = get_pdf_content(pdf_url)
@@ -81,8 +112,11 @@ index = pc.Index(host=os.environ.get("UNSIGNED_HOST"))
 #             )
 #     except Exception as e:
 #         return {"error":f"Content's Didn't Upserted Exception: {e}"}
-    
-#------------------------ ENDPOINT: /chat
+
+
+#------------------------------------------------------------------------#
+# ------------------------ [ENDPOINT: /chat ]----------------------------#
+#------------------------------------------------------------------------#
 class RequestModel(BaseModel):
     query: str
 
@@ -90,14 +124,20 @@ class RequestModel(BaseModel):
 async def chat(request: RequestModel):
     query = request.query
     try:
-        config = {"configurable": {"thread_id": "abcd123"}}
+        # config = {"configurable": {"thread_id": "abcd123"}} - Would this still preserve old contents
+        config= {"namespace":"notdecided", "configurable": {"thread_id": "abcd123"}}
 
-        def event_generator():
-            for chunk, meta in agentic_rag.stream(
-                {'messages': query}, config, stream_mode="messages"
+        async def event_generator():
+            async for chunk in naive_rag_graph.astream(
+                {'question': query}, config, stream_mode="custom"
             ):
-                if isinstance(chunk, AIMessage):
-                    yield chunk.content
+                if isinstance(chunk, GenerativeModel):
+                    yield chunk.model_dump_json() + "\n"
+                else:
+                    yield json.dumps(chunk) + "\n"
+                # if isinstance(chunk, AIMessage):
+                #     yield chunk.content
+                # TODO: remove structured Ouput from models, if custom streaming works
 
         return StreamingResponse(event_generator(), media_type='text/plain')
     except Exception as e:

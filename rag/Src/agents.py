@@ -1,4 +1,6 @@
 from Src.utils.state import GenerativeModel
+from Src.utils.nodes import reterive, generate
+from Src.utils.state import State
 
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import SystemMessage, HumanMessage
@@ -47,7 +49,18 @@ def model(state: MessagesState):
         print(str(e))
 
 memory = MemorySaver()
-agentic_rag = (StateGraph(state_schema = MessagesState)
+agentic_rag = (
+    StateGraph(state_schema = MessagesState)
     .add_node("model",model)
     .add_edge(START, "model")
-    .compile(checkpointer=memory))
+    .compile(checkpointer=memory)
+)
+
+memory_rag1 = MemorySaver()
+naive_rag_graph = (
+    StateGraph(State)
+    .add_sequence([reterive, generate])
+    .add_edge(START, "reterive")
+    .compile(checkpointer = memory_rag1)
+)
+advanced_rag_graph = None
