@@ -116,9 +116,17 @@ async def add_pdf(request:DocumentPost):
 
         embeddings = await get_embeddings(data)
         store.upsert(embeddings, data, namespace)
-        return {"SYSTEM":"Document is stored in the Vector Database"}
+        return {
+            "type":"SYSTEM",
+            "heading":"Success",
+            "content":"Document is stored in the Vector Database"
+        }
     except Exception as e:
-        return {"ERROR":f"Content's Didn't Upserted Exception: {e}"}
+        return {
+            "type":"ERROR",
+            "heading":"Exception",
+            "content": str(e)
+        }
 # def add_pdf(pdf_url:str, user_id=Depends(get_user_or_guest)):
 #     try:
 #         content = get_pdf_content(pdf_url)
@@ -160,4 +168,8 @@ async def chat(request: RequestModel):
 
         return StreamingResponse(event_generator(), media_type='text/plain')
     except Exception as e:
-        return {"ERROR": f"Exception: {e}"}
+        return {
+            "type":"ERROR",
+            "heading":"Exception",
+            "content": str(e)
+        }

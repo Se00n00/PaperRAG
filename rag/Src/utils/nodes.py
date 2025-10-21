@@ -57,7 +57,11 @@ async def reterive(state:State, config):
         return cont
     except Exception as e:
         writer = get_stream_writer()  
-        writer({"ERROR":str(e)})
+        writer({
+            "type":"ERROR",
+            "heading": "",
+            "content":str(e)
+        })
         return {"context": str(e)}
 
 #----------------------------------
@@ -78,5 +82,9 @@ async def generate(state:State):
         return {"answer":response.content}
     except Exception as e:
         writer = get_stream_writer()  
-        writer({"ERROR":str(e)})
+        writer({
+            "type":"ERROR",
+            "heading": "",
+            "content":str(e)
+        })
         return {"answer": str(e)}
