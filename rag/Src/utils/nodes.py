@@ -58,7 +58,7 @@ async def reterive(state:State, config):
     except Exception as e:
         writer = get_stream_writer()  
         writer({
-            "type":"ERROR",
+            "type":"SYSTEM",
             "heading": "",
             "content":str(e)
         })
@@ -83,7 +83,7 @@ async def generate(state:State):
     except Exception as e:
         writer = get_stream_writer()  
         writer({
-            "type":"ERROR",
+            "type":"SYSTEM",
             "heading": "",
             "content":str(e)
         })

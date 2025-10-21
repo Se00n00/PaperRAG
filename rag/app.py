@@ -123,7 +123,7 @@ async def add_pdf(request:DocumentPost):
         }
     except Exception as e:
         return {
-            "type":"ERROR",
+            "type":"SYSTEM",
             "heading":"Exception",
             "content": str(e)
         }
@@ -169,7 +169,7 @@ async def chat(request: RequestModel):
         return StreamingResponse(event_generator(), media_type='text/plain')
     except Exception as e:
         return {
-            "type":"ERROR",
+            "type":"SYSTEM",
             "heading":"Exception",
             "content": str(e)
         }
