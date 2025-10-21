@@ -88,7 +88,7 @@ index = pc.Index(host=os.environ.get("UNSIGNED_HOST"))
 
 class DocumentPost(BaseModel):
     url:str
-    # namespace: str
+    namespace: str
 
 @app.post("/upsert")
 async def add_pdf(request:DocumentPost):
@@ -99,7 +99,8 @@ async def add_pdf(request:DocumentPost):
     """
     # TODO: handle if pdf_chunks get over 200 records in a single namespace
     # TODO: Advanced Content Enrichment Techniques
-    namespace = "notdecided"
+    # namespace = "notdecided"
+    namespace = request.namespace
 
     try:
         pdf = get_pdf_from_url(request.url)
@@ -140,6 +141,29 @@ async def add_pdf(request:DocumentPost):
 #     except Exception as e:
 #         return {"error":f"Content's Didn't Upserted Exception: {e}"}
 
+#------------------------------------------------------------------------#
+# ------------------------ [ENDPOINT: /delete_namespace ]----------------#
+#------------------------------------------------------------------------#
+
+class DeleteRequest(BaseModel):
+    namespace: str
+
+@app.delete("/delete_namespace")
+def delete_namespace(request:DeleteRequest):
+    try:
+        store.delete_namespace(request.namespace)
+        return {
+            "type": "SYSTEM",
+            "heading": "Success",
+            "content": "Context Deleted"
+        }
+
+    except Exception as e:
+        return {
+            "type": "SYSTEM",
+            "heading": "Exception",
+            "content": str(e)
+        }
 
 #------------------------------------------------------------------------#
 # ------------------------ [ENDPOINT: /chat ]----------------------------#
