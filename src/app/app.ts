@@ -34,7 +34,7 @@ export class App implements AfterViewChecked {
   text: WritableSignal<string> = signal('');
   finalQuestion: WritableSignal<string> = signal('');
 
-  isSearched = signal(true)
+  isSearched = signal(false)
   isTouched = signal(false)
 
   thread_id: any
@@ -145,7 +145,10 @@ export class App implements AfterViewChecked {
   }
 
   // ---------------------------------------------------------------- New Session----------------------------------------
-  newSession(){
+  newSession(namespace:string){
+    if(!this.isSearched()) return
+
+    this.deletePdf(namespace)
     
     this.finalQuestion.set('')
     this.isSearched.set(false)
@@ -157,7 +160,25 @@ export class App implements AfterViewChecked {
     this.paperLink.set('')
 
     this.searchlink.set('')
+
+    // this.message2Component.set([{"type":"SYSTEM","heading":"Welcome","content":"Ask anything from the selected paper"}])
   }
+
+  deletePdf(namespace:string) {
+    const url = `${import.meta.env.NG_APP_RAG_BACKEND}/delete_namespace`
+    const body = { namespace: namespace};
+
+    this.http.delete(url, { headers: { 'Content-Type': 'application/json' }, body })
+      .subscribe({
+        next: (response) => {
+          console.log(response)
+        },
+        error: (err) => {
+          console.error('Error posting PDF URL:', err);
+        }
+      });
+  }
+  
   newConversation(message:any){
     this.message2Component.set([message])
     this.isSearched.set(true)

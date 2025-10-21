@@ -17,6 +17,8 @@ export class Papers {
   currentIndex = signal(0)
   index = 0
 
+  upload_started = signal(false)
+
 
   //---------------------- List of research papers Crousl
   upList(){
@@ -52,21 +54,22 @@ export class Papers {
   }
 
   upsertPdf(pdf_url:any) {
+    this.upload_started.set(true)
     const url = `${import.meta.env.NG_APP_RAG_BACKEND}/upsert`
-    const body = { url: pdf_url };
-    console.log("BODY :",body)
+    const body = { url: pdf_url , namespace:"notdecided"};
 
     // POST request
     this.http.post(url, body, { headers: { 'Content-Type': 'application/json' } })
       .subscribe({
         next: (response) => {
           this.startConversation.emit(response);
-          console.log('Backend response:', response);
         },
         error: (err) => {
+          
           console.error('Error posting PDF URL:', err);
         }
       });
+    this.upload_started.set(false)
   }
 
 }

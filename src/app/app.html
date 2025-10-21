@@ -19,6 +19,7 @@
     
     
   </div>
+  
 
   <!-- SHOW CONVERSTAION WITH RAG BACKEND  -->
   @if(isSearched()){
@@ -57,8 +58,11 @@
                 @Create New
               </div>
             } -->
-            <div class="select-none text-xs border-black/[0.2] border bg-black/[0.6] text-white ml-1 px-1.5 py-1 rounded-lg shadow-md">
-              {{isSearched()?'@Ask Questions':'@Search Pdfs'}}
+            <div (click)="newSession('notdecided')" class="select-none text-xs border-black/[0.2] border bg-black/[0.6] text-white ml-1 px-1.5 py-1 rounded-lg"
+            [ngClass]="{
+              'bg-yellow-400 border-orange-400/[0.2] cursor-pointer':isSearched()
+              }">
+              {{isSearched()?'@New Conversation':'@Search Pdfs'}}
             </div>
             
             
@@ -85,6 +89,7 @@
         class="shadow-xl border-black/[0.2] border bg-white h-20 rounded-xl font-light text-sm text-black/[0.5] p-3 resize-none focus:outline-none"
         type="text" ></textarea>
       </div>
+
 
       <span class="absolute right-3 bottom-3 flex size-3">
         <span 
