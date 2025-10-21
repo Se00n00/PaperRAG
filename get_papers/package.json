@@ -1,0 +1,8 @@
+{
+  "name": "semantic-scholar-proxy",
+  "version": "1.0.0",
+  "main": "api/search.js",
+  "scripts": {
+    "start": "node api/search.js"
+  }
+}
