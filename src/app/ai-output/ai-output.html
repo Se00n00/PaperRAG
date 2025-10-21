@@ -23,7 +23,9 @@
 </div>
 <div class="relative z-10 shadow-md shadow-black/[0.2] rounded-2xl w-[80vw] sm:w-[60vw] lg:w-[40vw]">
     <div class=" flex flex-col gap-1 border-black/[0.1] border bg-white rounded-2xl text-sm p-3">
-        <markdown [data]="heading" class="text-sm text-black font-semibold"></markdown>
+        @if(heading != ''){
+            <markdown [data]="heading" class="text-sm text-black font-semibold"></markdown>
+        }
         <markdown [data]="message" class="text-sm text-black/[0.7]"></markdown>
     </div>
 </div>

@@ -6,12 +6,12 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SementicScholar {
-  private baseUrl = 'https://api.semanticscholar.org/graph/v1';
+  private proxyUrl = 'https://paper-rag-nt9s.vercel.app/api/search'
 
   constructor(private http: HttpClient) {}
 
   searchPapers(query: string, limit: number = 5): Observable<any> {
-    const url = `${this.baseUrl}/paper/search?query=${encodeURIComponent(query)}&limit=${limit}&fields=title,authors,year,abstract,externalIds`;
+    const url = `${this.proxyUrl}?q=${encodeURIComponent(query)}`;
     return this.http.get(url);
   }
 }

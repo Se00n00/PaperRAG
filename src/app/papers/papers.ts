@@ -1,5 +1,7 @@
-import { Component, signal, Input, WritableSignal} from '@angular/core';
+import { Component, signal, Input, WritableSignal, Output, EventEmitter} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { options } from 'marked';
 @Component({
   selector: 'app-papers',
   imports: [CommonModule],
@@ -7,9 +9,11 @@ import { CommonModule } from '@angular/common';
   styleUrl: './papers.css'
 })
 export class Papers {
+  constructor(private http:HttpClient){}
   showauthors = signal(false)
   @Input() scholarPapers:any = []
   @Input() currentPaper:any
+  @Output() startConversation = new EventEmitter<any>()
   currentIndex = signal(0)
   index = 0
 
@@ -42,8 +46,27 @@ export class Papers {
       return null
     }
     const absLink = match[0]
-    const pdfLink = absLink.replace('/abs/', '/pdf/') + '.pdf'
+    const pdfLink = absLink.replace('/abs/', '/pdf/')
 
     return pdfLink;
   }
+
+  upsertPdf(pdf_url:any) {
+    const url = `${import.meta.env.NG_APP_RAG_BACKEND}/upsert`
+    const body = { url: pdf_url };
+    console.log("BODY :",body)
+
+    // POST request
+    this.http.post(url, body, { headers: { 'Content-Type': 'application/json' } })
+      .subscribe({
+        next: (response) => {
+          this.startConversation.emit(response);
+          console.log('Backend response:', response);
+        },
+        error: (err) => {
+          console.error('Error posting PDF URL:', err);
+        }
+      });
+  }
+
 }

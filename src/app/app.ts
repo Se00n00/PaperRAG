@@ -8,9 +8,11 @@ import { Article } from '../article/article';
 import { AiOutput } from './ai-output/ai-output';
 import { Papers } from './papers/papers';
 import { Supabase } from './service/authentication/supabase';
+import { retryWhen, delay, take, tap, filter } from 'rxjs/operators';
+
 interface Message{
   type: string
-  heading: string | null
+  heading: any
   content: string
 }
 
@@ -32,7 +34,7 @@ export class App implements AfterViewChecked {
   text: WritableSignal<string> = signal('');
   finalQuestion: WritableSignal<string> = signal('');
 
-  isSearched = signal(false)
+  isSearched = signal(true)
   isTouched = signal(false)
 
   thread_id: any
@@ -71,46 +73,49 @@ export class App implements AfterViewChecked {
 
           this.finalQuestion.set(query)
           this.isTouched.update((val)=>val = false)
-          // this.queryLLM(this.text())
-          this.search(this.text())
-          this.text.set("")
 
-          // if(type =="keyword" && !this.isSearched()){
-            
-          // }else if(this.isSearched()){
-          //   this.queryLLM(query)
-          //   this.text.set("")
-          // }
-          // else{
-          //   this.paperLink.set(query)
-          //   this.searchlinkInput.update((val)=>val = false)
-          //   this.gotpaper.update((val)=>val=true)
-          // }
+          if(this.isSearched()){
+            this.queryLLM(this.text())
+          }else{
+            this.search(this.text())
+          }
           
+          this.text.set("")
           return 0;
         }
       });
-    }, 1000);
+    }, 1500);
   }
 
   scholarPapers: WritableSignal<any[]> = signal([])
   currentPaper: any
 
   // ---------------------------------------------- Search for List of research papers
-  async search(query:string) {
-    this.scholar.searchPapers(query, 5).subscribe({
+  
+
+  async search(query: string) {
+    this.scholar.searchPapers(query, 5).pipe(
+      retryWhen(errors =>
+        errors.pipe(
+          filter(err => err?.status === 0 || err?.code === 0),
+          tap(() => console.warn('Error code 0, retrying...')),
+          delay(2000),
+          take(3)
+        )
+      )
+    ).subscribe({
       next: (data) => {
-        console.log(data.data)
-        this.scholarPapers.set(data.data)
-        if(data.data.length > 0){
-          this.currentPaper = data.data[0]
+        this.scholarPapers.set(data.data);
+        if (data.data.length > 0) {
+          this.currentPaper = data.data[0];
         }
       },
       error: (err) => {
-        console.error('Error fetching papers:', err);
+        console.error('Error fetching papers after retries:', err);
       },
     });
   }
+
 
 
 
@@ -153,6 +158,10 @@ export class App implements AfterViewChecked {
 
     this.searchlink.set('')
   }
+  newConversation(message:any){
+    this.message2Component.set([message])
+    this.isSearched.set(true)
+  }
 
   isValidUrl(url: string): boolean {
     try {
@@ -165,9 +174,6 @@ export class App implements AfterViewChecked {
 
   // ---------------------------------------------------------------- RAG CHAT REQUEST -----------------------------------------------------------
   message2Component:WritableSignal<Message[]> = signal([
-    {type:"USER", heading:null, content:"Hii! **Hello**"},
-    {type:"ASSISTANT", heading:"Introduction", content:"### Hello! how may i help you ?"},
-    {type:"SYSTEM", heading:"Error", content:"Something just happened!"}
   ])
 
   async queryLLM(prompt: string) {
@@ -176,7 +182,7 @@ export class App implements AfterViewChecked {
       {type:"USER", heading:null, content:prompt}
     ]);
     
-    let res = await fetch("https://paperrag-ut04.onrender.com/chat", {
+    let res = await fetch(`${import.meta.env.NG_APP_RAG_BACKEND}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query: prompt })

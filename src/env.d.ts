@@ -4,6 +4,7 @@ declare interface Env {
   readonly NG_APP_SUPABASE_ANONKEY: string;
   readonly NG_APP_REDIRECT: string;
   readonly NG_APP_PAPERS_BACKEND: string;
+  readonly NG_APP_RAG_BACKEND: string
   [key: string]: any;
 }
 

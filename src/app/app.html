@@ -39,7 +39,7 @@
 
     <!-- SHOW SEARCHED LIST OF PAPERS  -->
     @if(currentPaper && !isSearched()){
-      <app-papers [scholarPapers]="scholarPapers()" [currentPaper]="currentPaper"/>
+      <app-papers (startConversation)="newConversation($event)" [scholarPapers]="scholarPapers()" [currentPaper]="currentPaper"/>
     }
 
     <!-- SEARCH FOR PAPERS  -->

@@ -66,18 +66,18 @@
             </div>
             </div>
             @if(currentPaper.openAccessPdf["url"]){
-                <div class="bg-white/[0.1] text-white border border-white/[0.1] text-xs p-1 px-2 rounded-md flex items-center gap-1.5 hover:scale-[1.05] transition-all cursor-pointer">
+                <div (click)="upsertPdf(currentPaper.openAccessPdf['url'])" class="bg-white/[0.1] text-white border border-white/[0.1] text-xs p-1 px-2 rounded-md flex items-center gap-1.5 hover:scale-[1.05] transition-all cursor-pointer">
                     Ask AI 
                     <img src="icon/sparkles.svg" class="h-4">
                 </div>
             }@else{
-                <div class="bg-white/[0.1] text-white border border-white/[0.1] text-xs p-1 px-2 rounded-md flex items-center gap-1.5 hover:scale-[1.05] transition-all cursor-pointer">
+                <div (click)="upsertPdf(GetPdfLink(currentPaper.openAccessPdf['disclaimer']))" class="bg-white/[0.1] text-white border border-white/[0.1] text-xs p-1 px-2 rounded-md flex items-center gap-1.5 hover:scale-[1.05] transition-all cursor-pointer">
                     Ask AI 
                     <img src="icon/sparkles.svg" class="h-4">
                 </div>
             }
             
-        </div>
+            </div>
         </div>
         <div class="w-max absolute -right-5 sm:-right-10 flex flex-col items-center">
         @for (item of scholarPapers; track $index) {
