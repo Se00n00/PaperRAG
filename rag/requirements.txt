@@ -17,3 +17,4 @@ semanticscholar
 beautifulsoup4
 asyncio
 fastmcp
+pypdf
