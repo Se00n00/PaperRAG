@@ -173,8 +173,7 @@ export class App implements AfterViewChecked {
   }
 
   // ---------------------------------------------------------------- RAG CHAT REQUEST -----------------------------------------------------------
-  message2Component:WritableSignal<Message[]> = signal([
-  ])
+  message2Component:WritableSignal<Message[]> = signal([])
 
   async queryLLM(prompt: string) {
     this.message2Component.update(prev => [
@@ -193,10 +192,10 @@ export class App implements AfterViewChecked {
     if (!reader) return;
 
     try {
-      this.message2Component.update(prev => [
-        ...prev,
-        {type:"ASSISTANT", heading:"", content:""}
-      ]);
+      // this.message2Component.update(prev => [
+      //   ...prev,
+      //   {type:"ASSISTANT", heading:"", content:""}
+      // ]);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -208,6 +207,7 @@ export class App implements AfterViewChecked {
         let data;
         try {
           data = JSON.parse(chunk);
+          // console.log(data)
         } catch {
           console.warn("Non-JSON chunk:", chunk);
           continue;
@@ -225,13 +225,13 @@ export class App implements AfterViewChecked {
                 heading: data.heading ?? updated[lastIndex].heading,
                 content:
                   (updated[lastIndex].content || "") +
-                  (data.answer ?? "")
+                  (data.content ?? "")
               };
             } else {
               updated.push({
                 type: "ASSISTANT",
                 heading: data.heading ?? "Response",
-                content: data.answer ?? ""
+                content: data.content ?? ""
               });
             }
 
