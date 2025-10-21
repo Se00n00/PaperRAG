@@ -3,7 +3,7 @@ from Utils.get_papers import get_papers, get_paper
 from Src.agents import agentic_rag, naive_rag_graph
 from Src.utils.tools import get_embeddings, VectorStore
 from Src.utils.state import GenerativeModel
-
+from Utils.pdf_utils import get_pdf_chunks, get_pdf_from_url, delete_pdf_file
 from fastapi import FastAPI, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -87,14 +87,31 @@ pc = Pinecone(api_key=os.environ.get("PINECONE_APIKEY"))
 index = pc.Index(host=os.environ.get("UNSIGNED_HOST"))
 
 class DocumentPost(BaseModel):
-    documents: list[str]
+    url:str
+    # namespace: str
 
 @app.post("/upsert")
 async def add_pdf(request:DocumentPost):
-    # async def add_pdf(data:list[str], namespace:str):
+    """
+    Add_pdf gets url of pdf and user's namespace.
+    It downloads the pdf_file, breaks it into chunks and then delete whole to avoid memory usage
+    After these chunks are upserted in Vector Database with namespace associated with user's namespace 
+    """
+    namespace = "notdecided"
+
     try:
-        data = test_data
-        namespace = "notdecided"
+        pdf = get_pdf_from_url(request.url)
+        pdf_data = None
+
+        if(pdf[0] == 0):
+            pdf_file_path = pdf[1]
+            pdf_data = get_pdf_chunks(pdf_file_path)
+            delete_pdf_file(pdf_file_path)
+        else:
+            raise Exception(pdf[1])
+        
+        data = [d.page_content for d in pdf_data]
+
         embeddings = await get_embeddings(data)
         store.upsert(embeddings, data, namespace)
         return {"SYSTEM":"Document is stored in the Vector Database"}
