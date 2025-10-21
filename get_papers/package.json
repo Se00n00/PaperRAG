@@ -1,6 +1,7 @@
 {
-  "name": "semantic-scholar-proxy",
+  "name": "semantic-proxy",
   "version": "1.0.0",
+  "type": "module",
   "main": "api/search.js",
   "scripts": {
     "start": "node api/search.js"

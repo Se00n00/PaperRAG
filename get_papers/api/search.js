@@ -8,7 +8,7 @@ export default async function handler(req, res) {
         const response = await fetch(url);
 
         if (!response.ok) {
-        return res.status(response.status).json({ error: 'Semantic Scholar error' });
+            return res.status(response.status).json({ error: 'Semantic Scholar error' });
         }
 
         const data = await response.json();
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
         if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+            return res.status(200).end();
         }
 
         return res.status(200).json(data);
