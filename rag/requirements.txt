@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 pydantic
+typing
 numpy
 pinecone
 PyMuPDF
@@ -8,7 +9,10 @@ python-dotenv
 supabase
 langchain-openai
 langchain
+langchain_text_splitters
 langgraph
+langchain_core
+langchain_community
 semanticscholar
 beautifulsoup4
 asyncio
