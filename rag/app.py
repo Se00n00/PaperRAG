@@ -1,5 +1,5 @@
 # from Utils.get_pdf_contents import get_pdf_content
-from Utils.get_papers import get_papers, get_paper
+# from Utils.get_papers import get_papers, get_paper
 from Src.agents import agentic_rag, naive_rag_graph
 from Src.utils.tools import get_embeddings, VectorStore
 from Src.utils.state import GenerativeModel
@@ -69,16 +69,16 @@ def home():
     return {"message":"I will Make it"}
 
 #------------------------------------------------- ENDPOINT: /papers + /paper
-class Url_request(BaseModel):
-    query:str
+# class Url_request(BaseModel):
+#     query:str
 
-@app.post("/papers")
-def papers(request:Url_request):
-    return get_papers(request.query)
+# @app.post("/papers")
+# def papers(request:Url_request):
+#     return get_papers(request.query)
 
-@app.post("/paper")
-def paper(request:Url_request):
-    return get_paper(request.query)
+# @app.post("/paper")
+# def paper(request:Url_request):
+#     return get_paper(request.query)
 
 #------------------------------------------------------------------------#
 # ------------------------ [ENDPOINT: /upsert ]--------------------------#
@@ -97,6 +97,8 @@ async def add_pdf(request:DocumentPost):
     It downloads the pdf_file, breaks it into chunks and then delete whole to avoid memory usage
     After these chunks are upserted in Vector Database with namespace associated with user's namespace 
     """
+    # TODO: handle if pdf_chunks get over 200 records in a single namespace
+    # TODO: Advanced Content Enrichment Techniques
     namespace = "notdecided"
 
     try:

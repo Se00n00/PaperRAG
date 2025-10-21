@@ -1,8 +1,6 @@
 fastapi
 uvicorn
 pydantic
-onnxruntime
-transformers
 numpy
 pinecone
 PyMuPDF
@@ -14,3 +12,4 @@ langgraph
 semanticscholar
 beautifulsoup4
 asyncio
+fastmcp
