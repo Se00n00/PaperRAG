@@ -111,37 +111,13 @@
     <!-- ==== START Component: Show the available examples of the papers ==== -->
     <!-- ==================================================================== -->
 
-    <div class="relative flex items-center select-none bg-black/[0.1] p-1 w-[80vw] sm:w-[60vw] lg:w-[40vw] rounded-2xl">
-      <span class="h-20 w-40 absolute right-0 top-0 blur-2xl bg-blue-400/[0.5] motion-safe:animate-pulse animate-spin"></span>
-      <div class="flex-1 bg-black/[0.9] rounded-xl h-20 flex justify-between gap-3 p-2 px-4 items-center">
-        <img src="icon/documents.svg" class="h-9">
-        <div class="text-white text-sm flex flex-col w-full">
-          <div class="w-full text-sm ">{{Paper_List[Current_paper_index()].title}}</div>
-          <div class="flex justify-between">
-            <span class="text-xs">{{Paper_List[Current_paper_index()].author}}</span>
-            <span class="text-xs">{{Paper_List[Current_paper_index()].year}}</span>
-          </div>
-          
-        </div>
-        <span class="cursor-pointer z-10 text-nowrap hover:scale-[0.97] transition-all w-max flex items-center gap-2 text-xs rounded-xl p-1 px-2 border border-white/[0.2] bg-white/[0.1] text-white">
-          Ask AI
-        </span>
-      </div>
-      <div class="absolute -right-3 flex flex-col gap-1">
-        @for (item of Paper_List; track $index) {
-          <div class="h-2 w-1 rounded-full"
-          [ngClass]="{
-            'bg-white shadow shadow-black/[0.2]':$index == Current_paper_index(),
-            'bg-black/[0.1]':$index != Current_paper_index(),
-            }"></div>
-        }
-      </div>
-    </div>
+    <app-examples/>
 
     <!-- ==================================================================== -->
     <!-- ==== END Component: Show the available examples of the papers ====== -->
     <!-- ==================================================================== -->
 
+    <app-upsert-status class="fixed"/>
   </div>
   <!-- ================================SEARCH LIST OF PAPERS: ENDS HERE=================================  -->
 

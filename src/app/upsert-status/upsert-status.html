@@ -1,0 +1,37 @@
+<div class="h-screen w-screen flex justify-center items-center backdrop-blur-md">
+    <div class="select-none bg-white p-3 w-[80vw] sm:w-[60vw] lg:w-[40vw] rounded-lg shadow-[2px_2px_0px_#00000020,2px_2px_10px_#00000020] border border-black/[0.2] flex-col flex gap-5">
+        <div class="flex justify-between items-center">
+            <span class="flex gap-2 items-center text-black text-sm">
+                <img src="frame.svg" class="h-6">
+                <span>Paper Analyzer</span>
+            </span>
+            <span (click)="close()" class="bg-white rounded-md p-2.5 shadow-[2px_2px_0px_#000000] active:shadow-[1px_1px_0px_#000000] border block cursor-pointer transition-all"></span>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <div class="flex p-1 rounded-md gap-1">
+                <span class="flex-1 text-sm rounded-sm p-0.5 px-2 text-black/[0.5]">Title</span>
+                <span class="flex-[0.3] text-sm rounded-sm p-0.5 px-2 text-black/[0.5]">Author</span>
+                <span class="flex-[0.1] text-sm rounded-sm p-0.5 px-2 text-black/[0.5]">Year</span>
+            </div>
+            <div class="flex bg-black/[0.8] p-1 rounded-md gap-1 font-light text-xs shadow-[2px_2px_0px_#000000b0]">
+                <span class="flex-1 rounded-sm p-1 px-2 bg-white/[0.15] text-white rounded-r-none">{{title}}</span>
+                <span class="flex-[0.3] p-1 px-2 bg-white/[0.15] text-white">{{author}}</span>
+                <span class="flex-[0.1] rounded-sm p-1 px-2 bg-white/[0.15] text-white rounded-l-none">{{year}}</span>
+            </div>
+            <div class="flex gap-2">
+                <div (click)="close()" class="flex-1 border border-blue-600 text-xs font-light p-1 rounded-md bg-blue-500 text-white px-2 shadow-[2px_2px_0px_#155dfc] active:shadow-[1px_1px_0px_#155dfc] cursor-pointer">
+                    {{status == 0? 'Upserting ...':status == -1?'Upsert Failed':'Upsert Complete'}}
+                </div>
+                <span class="p-0.5 border rounded-md"
+                [ngClass]="{
+                    'bg-green-600/[0.5] border-green-600 shadow-[2px_2px_0px_#00aa00c0]':status == 1,
+                    'bg-black/[0.3] border-black/[0.2] shadow-[2px_2px_0px_#00000070]':status == 0,
+                    'bg-red-600/[0.5] border-red-600 shadow-[2px_2px_0px_#aa0000a0]':status == -1
+                }">
+                    <img src="icon/database.svg" class="h-5">
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
