@@ -13,7 +13,14 @@ export class Papers {
   showauthors = signal(false)
   @Input() scholarPapers:any = []
   @Input() currentPaper:any
-  @Output() startConversation = new EventEmitter<any>()
+  @Output() Upsert_process = new EventEmitter<boolean>()
+  @Output() paper_details = new EventEmitter<{
+    url:string,
+    title:string, 
+    year:number,
+    author:string
+  }>()
+
   currentIndex = signal(0)
   index = 0
 
@@ -53,23 +60,30 @@ export class Papers {
     return pdfLink;
   }
 
-  upsertPdf(pdf_url:any) {
-    this.upload_started.set(true)
-    const url = `${import.meta.env.NG_APP_RAG_BACKEND}/upsert`
-    const body = { url: pdf_url , namespace:"notdecided"};
-
-    // POST request
-    this.http.post(url, body, { headers: { 'Content-Type': 'application/json' } })
-      .subscribe({
-        next: (response) => {
-          this.startConversation.emit(response);
-        },
-        error: (err) => {
-          
-          console.error('Error posting PDF URL:', err);
-        }
-      });
-    this.upload_started.set(false)
+  Ask_ai(url:any, title:string, year:number, author:string){
+    this.Upsert_process.emit(true)
+    this.paper_details.emit(
+      {url,title,year,author}
+    )
   }
+
+  // upsertPdf(pdf_url:any) {
+  //   this.upload_started.set(true)
+  //   const url = `${import.meta.env.NG_APP_RAG_BACKEND}/upsert`
+  //   const body = { url: pdf_url , namespace:"notdecided"};
+
+  //   // POST request
+  //   this.http.post(url, body, { headers: { 'Content-Type': 'application/json' } })
+  //     .subscribe({
+  //       next: (response) => {
+  //         this.startConversation.emit(response);
+  //       },
+  //       error: (err) => {
+          
+  //         console.error('Error posting PDF URL:', err);
+  //       }
+  //     });
+  //   this.upload_started.set(false)
+  // }
 
 }

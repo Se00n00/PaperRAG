@@ -17,6 +17,11 @@ interface Message{
   heading: any
   content: string
 }
+interface Upsert_ApiResponse {
+  type: string
+  heading: string;
+  content: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -292,5 +297,47 @@ export class App implements AfterViewChecked {
   // ----------------------------------------------------------------
   // List of Example Papers: ----------------------------------------
   // ----------------------------------------------------------------
+  Upsert_process = signal(false)
+  paper_details:any = signal(null)
+  Upsert_result_status = signal(0)
+
+  Close_upsert_process(process_signal:boolean){
+    this.Upsert_process.set(process_signal)
+    if(process_signal == false){
+      this.Upsert_result_status.set(0)
+    }
+  }
+  upsert_paper_details(details:any){
+    
+    this.paper_details.set({
+      url:details.url,
+      title:details.title,
+      year:details.year,
+      author:details.author,
+    })
+    this.upsertPdf(details.url)
+  }
+
   
+  upsertPdf(pdf_url:any) {
+    const url = `${import.meta.env.NG_APP_RAG_BACKEND}/upsert`
+    const body = { url: pdf_url , namespace:"notdecided"};
+
+    this.http.post<Upsert_ApiResponse>(url, body, { headers: { 'Content-Type': 'application/json' } })
+      .subscribe({
+        next: (response) => {
+          if (response['heading'] != 'Success'){
+            this.Upsert_result_status.set(-1)
+          }else{
+            this.Upsert_result_status.set(1)
+          }
+          // if(response['type'] ==)
+          this.newConversation(response)
+        },
+        error: (err) => {
+          
+          console.error('Error posting PDF URL:', err);
+        }
+      });
+  }
 }

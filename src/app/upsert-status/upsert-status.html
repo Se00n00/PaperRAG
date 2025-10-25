@@ -20,9 +20,19 @@
                 <span class="flex-[0.1] rounded-sm p-1 px-2 bg-white/[0.15] text-white rounded-l-none">{{year}}</span>
             </div>
             <div class="flex gap-2">
-                <div (click)="close()" class="flex-1 border border-blue-600 text-xs font-light p-1 rounded-md bg-blue-500 text-white px-2 shadow-[2px_2px_0px_#155dfc] active:shadow-[1px_1px_0px_#155dfc] cursor-pointer">
-                    {{status == 0? 'Upserting ...':status == -1?'Upsert Failed':'Upsert Complete'}}
+                <div
+                class="relative flex-1 border border-blue-600 text-xs font-light p-1 rounded-md text-white px-2 shadow-[2px_2px_0px_#155dfc] overflow-hidden"
+                [ngClass]="{'bg-blue-500':status != 0, 'bg-white':status==0}"
+                >
+                    <span class="absolute z-20 block">
+                        {{status == 0 ? 'Upserting ...' : status == -1 ? 'Upsert Failed' : 'Upsert Complete'}}
+                    </span>
+                    @if(status == 0){
+                        <div class="scale absolute top-0 left-0 h-full bg-blue-500 z-10"></div>
+                    }
+                    
                 </div>
+
                 <span class="p-0.5 border rounded-md"
                 [ngClass]="{
                     'bg-green-600/[0.5] border-green-600 shadow-[2px_2px_0px_#00aa00c0]':status == 1,

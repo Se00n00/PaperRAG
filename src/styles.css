@@ -16,3 +16,13 @@
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.3; transform: scale(0.7); }
 }
+
+@keyframes scale {
+  0% {transform: scaleX(0);}
+  100% {transform:  scaleX(1)}
+}
+.scale {
+  animation: scale 2s ease-out forwards;
+  transform-origin: left;
+  width: 100%;
+}

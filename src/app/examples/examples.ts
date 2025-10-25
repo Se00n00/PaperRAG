@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, EventEmitter, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,9 +8,18 @@ import { CommonModule } from '@angular/common';
   styleUrl: './examples.css'
 })
 export class Examples {
+  @Output() Upsert_process = new EventEmitter<boolean>()
+  @Output() paper_details = new EventEmitter<{
+    url:string,
+    title:string, 
+    year:number,
+    author:string
+  }>()
+  
   constructor(){
     this.periodic_inc_current_paper_index()
   }
+
   Current_paper_index = signal(0)
   Paper_List = [
     {"title":"Attention Is All You Need", "year":2017, "author":"Vaswani et al.", "link_to_pdf":"https://arxiv.org/pdf/1706.03762"},
@@ -26,5 +35,12 @@ export class Examples {
         (value:number) => (value+1)%this.Paper_List.length
       )
     }, 3000)
+  }
+
+  Ask_ai(url:string, title:string, year:number, author:string){
+    this.Upsert_process.emit(true)
+    this.paper_details.emit(
+      {url,title,year,author}
+    )
   }
 }

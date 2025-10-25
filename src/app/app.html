@@ -43,7 +43,7 @@
     }
 
     <div class="text-xs font-light p-1 px-2.5 rounded-xl bg-black/[0.05] border border-black/[0.08] text-black/[0.8]">
-      An Advanced-RAG Application
+      An Advanced-Agentic RAG Application
     </div>
 
     <!-- SEARCH FOR PAPERS  -->
@@ -107,17 +107,31 @@
       </span>
     </div>
 
-    <!-- ==================================================================== -->
+    <!-- -------------------------------------------------------------------- -->
     <!-- ==== START Component: Show the available examples of the papers ==== -->
-    <!-- ==================================================================== -->
 
-    <app-examples/>
+    <app-examples (Upsert_process)="Close_upsert_process($event)" (paper_details)="upsert_paper_details($event)"/>
 
-    <!-- ==================================================================== -->
     <!-- ==== END Component: Show the available examples of the papers ====== -->
-    <!-- ==================================================================== -->
+    <!-- -------------------------------------------------------------------- -->
+     
+    <!-- -------------------------------------------------------------------- -->
+    <!-- ======== START Component: process & Status of Upserting  =========== -->
 
-    <app-upsert-status class="fixed"/>
+    @if (Upsert_process()) {
+      <app-upsert-status 
+      class="fixed" 
+      (close_window)="Close_upsert_process($event)"
+      [title]="paper_details().title" 
+      [year]="paper_details().year"
+      [author]="paper_details().author"
+      [status]="Upsert_result_status()"
+      />
+    }
+
+    <!-- ========= END Component: process & Status of Upserting ============= -->
+    <!-- -------------------------------------------------------------------- -->
+    
   </div>
   <!-- ================================SEARCH LIST OF PAPERS: ENDS HERE=================================  -->
 

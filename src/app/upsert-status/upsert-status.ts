@@ -10,12 +10,12 @@ export class UpsertStatus {
   @Input() title = 'Attention is all you need'
   @Input() author = 'Vaswani et al.'
   @Input() year = 2017
-  @Input() status = 1
+  @Input() status = 0
   @Output() close_window = new EventEmitter<boolean>();
 
   close(){
     if(this.status != 0){
-      this.close_window.emit(true)
+      this.close_window.emit(false)
     }
   }
 }
