@@ -44,6 +44,7 @@ export class App implements AfterViewChecked {
   finalQuestion: WritableSignal<string> = signal('');
 
   isSearched = signal(false)
+  sementic_searched = signal(false)
   isTouched = signal(false)
 
   thread_id: any
@@ -103,6 +104,7 @@ export class App implements AfterViewChecked {
   
 
   async search(query: string) {
+    this.sementic_searched.set(true)
     this.scholar.searchPapers(query, 5).pipe(
       retryWhen(errors =>
         errors.pipe(
@@ -155,9 +157,10 @@ export class App implements AfterViewChecked {
 
   // ---------------------------------------------------------------- New Session----------------------------------------
   newSession(namespace:string){
-    if(!this.isSearched()) return
 
     this.deletePdf(namespace)
+
+    this.sementic_searched.set(false)
     
     this.finalQuestion.set('')
     this.isSearched.set(false)

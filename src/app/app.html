@@ -21,12 +21,19 @@
   
 
   <!-- SHOW CONVERSTAION WITH RAG BACKEND  -->
-  @if(isSearched()){
-    <div class="flex flex-col items-center">
-      @for (item of message2Component(); track $index) {
-        <app-ai-output [type]="item.type" [heading]="item.heading" [message]="item.content" class=""/>
-      }
-      <div #bottom class="h-80"></div>
+  @if(isSearched() && !Upsert_process()){
+    <div class="relative grid min-h-[60vh] grid-cols-[1fr_2.5rem_auto_2.5rem_1fr] grid-rows-[1fr_1px_auto_1px_1fr] bg-white [--pattern-fg:var(--color-gray-950)]/5 dark:bg-gray-950 dark:[--pattern-fg:var(--color-white)]/10">
+      <div class="col-start-3 row-start-3 flex flex-col bg-gray-100 px-3.5 dark:bg-white/10 relative">
+        
+        @for (item of message2Component(); track $index) {
+          <app-ai-output [type]="item.type" [heading]="item.heading" [message]="item.content" class="-translate-y-3.5"/>
+          
+        }
+      </div>
+      <div class="relative -right-px col-start-2 row-span-full row-start-1 border-x border-x-(--pattern-fg) bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed"></div>
+      <div class="relative -left-px col-start-4 row-span-full row-start-1 border-x border-x-(--pattern-fg) bg-[image:repeating-linear-gradient(315deg,_var(--pattern-fg)_0,_var(--pattern-fg)_1px,_transparent_0,_transparent_50%)] bg-[size:10px_10px] bg-fixed"></div>
+      <div class="relative -bottom-px col-span-full col-start-1 row-start-2 h-px bg-(--pattern-fg)"></div>
+      <div class="relative -top-px col-span-full col-start-1 row-start-4 h-px bg-(--pattern-fg)"></div>
     </div>
   }
 
@@ -39,18 +46,24 @@
 
     <!-- SHOW SEARCHED LIST OF PAPERS  -->
     @if(currentPaper && !isSearched()){
-      <app-papers (startConversation)="newConversation($event)" [scholarPapers]="scholarPapers()" [currentPaper]="currentPaper"/>
+      <app-papers (Upsert_process)="Close_upsert_process($event)" (paper_details)="upsert_paper_details($event)" [scholarPapers]="scholarPapers()" [currentPaper]="currentPaper"/>
     }
 
-    <div class="text-xs font-light p-1 px-2.5 rounded-xl bg-black/[0.05] border border-black/[0.08] text-black/[0.8]">
-      An Advanced-Agentic RAG Application
-    </div>
+    @if(!isSearched() && !sementic_searched() ){
+      <div class="text-xs font-light p-1 px-2.5 mb-10 rounded-xl bg-black/[0.05] border border-black/[0.08] text-black/[0.8]">
+        An Advanced-Agentic RAG Application
+      </div>
+    }
+
+  
+
+    
 
     <!-- SEARCH FOR PAPERS  -->
-    <div class="relative bg-black/[0.05] backdrop-blur-md rounded-2xl p-1.5"
+    <div class="relative bg-black/[0.05] backdrop-blur-md rounded-2xl p-1.5 shadow-[2px_2px_0px_#00000020]"
     [ngClass]="{
       'relative':scholarPapers().length === 0,
-      'fixed bottom-5':scholarPapers().length > 0
+      'absolute bottom-5 z-0':scholarPapers().length > 0 || !isSearched()
     }">
 
       <div class="flex flex-col justify-between w-[80vw] sm:w-[60vw] lg:w-[40vw] gap-1">
@@ -61,13 +74,13 @@
                 @Create New
               </div>
             } -->
-            <div (click)="newSession('notdecided')" class="select-none text-xs border-black/[0.2] border bg-black/[0.6] text-white ml-1 px-1.5 py-1 rounded-lg"
+            <div (click)="newSession('notdecided')" class="select-none cursor-pointer text-xs text-white ml-1 px-1.5 py-1 rounded-lg transition-all"
             [ngClass]="{
-              'bg-yellow-400 border-orange-400/[0.2] cursor-pointer':isSearched()
+              'bg-yellow-400 border border-black shadow-[2px_2px_0px_#fdc70080] active:shadow-[1px_1px_0px_#fdc70080]':isSearched(),
+              'border-black/[0.2] border bg-black/[0.6] shadow-[2px_2px_0px_#000000] active:shadow-[1px_1px_0px_#000000]':!isSearched()
               }">
               {{isSearched()?'@New Conversation':'@Search Pdfs'}}
             </div>
-            
             
           </div>
           
@@ -109,25 +122,18 @@
 
     <!-- -------------------------------------------------------------------- -->
     <!-- ==== START Component: Show the available examples of the papers ==== -->
-
-    <app-examples (Upsert_process)="Close_upsert_process($event)" (paper_details)="upsert_paper_details($event)"/>
-
+    
+    @if(!isSearched() && !sementic_searched()){
+      <app-examples (Upsert_process)="Close_upsert_process($event)" (paper_details)="upsert_paper_details($event)"/>
+    }
+    
     <!-- ==== END Component: Show the available examples of the papers ====== -->
     <!-- -------------------------------------------------------------------- -->
      
     <!-- -------------------------------------------------------------------- -->
     <!-- ======== START Component: process & Status of Upserting  =========== -->
 
-    @if (Upsert_process()) {
-      <app-upsert-status 
-      class="fixed" 
-      (close_window)="Close_upsert_process($event)"
-      [title]="paper_details().title" 
-      [year]="paper_details().year"
-      [author]="paper_details().author"
-      [status]="Upsert_result_status()"
-      />
-    }
+    
 
     <!-- ========= END Component: process & Status of Upserting ============= -->
     <!-- -------------------------------------------------------------------- -->
@@ -136,3 +142,14 @@
   <!-- ================================SEARCH LIST OF PAPERS: ENDS HERE=================================  -->
 
 </div>
+
+@if (Upsert_process()) {
+  <app-upsert-status 
+  class="fixed" 
+  (close_window)="Close_upsert_process($event)"
+  [title]="paper_details().title" 
+  [year]="paper_details().year"
+  [author]="paper_details().author"
+  [status]="Upsert_result_status()"
+  />
+}

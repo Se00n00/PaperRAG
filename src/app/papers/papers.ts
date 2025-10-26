@@ -62,6 +62,7 @@ export class Papers {
 
   Ask_ai(url:any, title:string, year:number, author:string){
     this.Upsert_process.emit(true)
+    author = author[0] + 'et al.'
     this.paper_details.emit(
       {url,title,year,author}
     )
