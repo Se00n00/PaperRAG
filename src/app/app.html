@@ -1,4 +1,4 @@
-<div class="relative flex-1  h-full shadow-md border border-black/[0.4] bg-white  flex flex-col p-1 items-center rounded-xl max-h-screen overflow-scroll"
+<div class="relative flex-1  h-full shadow-md border border-black/[0.4] bg-white  flex flex-col p-1 items-center rounded-xl overflow-auto"
   [ngClass]="{
     '':scholarPapers().length === 0,
     'items-center':scholarPapers().length > 0
@@ -22,10 +22,10 @@
 
   <!-- SHOW CONVERSTAION WITH RAG BACKEND  -->
   @if(isSearched() && !Upsert_process()){
-    <div class="relative grid grid-rows-[1fr_1px_auto]">
+    <div class="relative grid grid-rows-[1fr_1px_auto] w-full">
       <div>
 
-        <div class="relative grid grid-cols-[1fr_1.5rem_auto_1.5rem_1fr] grid-rows-[1fr_0px_auto_0px] bg-white [--pattern-fg:var(--color-gray-950)]/5 dark:bg-gray-950 dark:[--pattern-fg:var(--color-white)]/10">
+        <div class="relative grid grid-cols-[1fr_1.5rem_auto_1.5rem_1fr] grid-rows-[1fr_0px_auto_0px] bg-white [--pattern-fg:var(--color-gray-950)]/5">
           <div class="col-start-3 row-start-3 flex flex-col px-3.5 relative">
             <app-ai-output class="opacity-0 h-10"/>
           </div>
@@ -35,7 +35,7 @@
         </div>
 
         @for (item of message2Component(); track $index) {
-          <div class="relative grid grid-cols-[1fr_1.5rem_auto_1.5rem_1fr] grid-rows-[1fr_0px_auto_0px] bg-white [--pattern-fg:var(--color-gray-950)]/5 dark:bg-gray-950 dark:[--pattern-fg:var(--color-white)]/10">
+          <div class="relative grid grid-cols-[1fr_1.5rem_auto_1.5rem_1fr] grid-rows-[1fr_0px_auto_0px] bg-white [--pattern-fg:var(--color-gray-950)]/5">
           
             <div class="col-start-3 row-start-3 flex flex-col bg-gray-100 px-3.5 dark:bg-white/10 relative">
               
@@ -52,7 +52,7 @@
           
         }
 
-        <div class="relative grid grid-cols-[1fr_1.5rem_auto_1.5rem_1fr] grid-rows-[1fr_0px_auto_0px] bg-white [--pattern-fg:var(--color-gray-950)]/5 dark:bg-gray-950 dark:[--pattern-fg:var(--color-white)]/10">
+        <div class="relative grid grid-cols-[1fr_1.5rem_auto_1.5rem_1fr] grid-rows-[1fr_0px_auto_0px] bg-white [--pattern-fg:var(--color-gray-950)]/5">
           <div class="col-start-3 row-start-3 flex flex-col px-3.5 relative">
             <app-ai-output class="opacity-0 h-10"/>
           </div>
@@ -97,6 +97,7 @@
     <div class="relative bg-black/[0.05] backdrop-blur-md rounded-2xl p-1.5 shadow-[2px_2px_0px_#00000020]"
     [ngClass]="{
       'relative':scholarPapers().length === 0,
+      'mb-5': isSearched(),
       'absolute bottom-5 z-0':scholarPapers().length > 0 || !isSearched()
     }">
 
