@@ -1,0 +1,20 @@
+[
+    {
+        "dataset":"rajpurkar/squad_v2",
+        "sub_set":"train",
+        "key_fields": [
+            ["question"],
+            ["context"],
+            ["answers", "text", 0]
+        ]
+    },
+    {
+        "dataset":"allenai/sciq",
+        "sub_set":"train",
+        "key_fields": [
+            ["question"],
+            ["support"],
+            ["correct_answer"]
+        ]
+    }
+]

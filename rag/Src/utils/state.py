@@ -6,7 +6,12 @@ class GenerativeModel(BaseModel):
   heading: str
   content: str
 
+class GenerateQueries(BaseModel):
+  queries: str
+
 class State(TypedDict):
-  question:str
-  context:List[str]
+  question: str
+  context: List[str]
   answer: str
+  queries: List[str]
+  step_back: str
