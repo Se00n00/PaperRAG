@@ -1,0 +1,7 @@
+Answer the question based only on the following context: {context}
+    Question: {question}
+
+    Answer the question in following Schema
+        type: "ASSISTANT"  <--- keep string intact
+        heading: <heading of your answer>
+        content: <your answer>

@@ -35,6 +35,12 @@ mcp = MCPHelper(url)
 async def get_embeddings(data: list[str]):
   return await mcp.call("embeddings", {"data": data})
 
+async def curated_index(data, query):
+  return await mcp.call("curate", {"data": data, "query": query})
+
+async def rerank_index(data, query):
+  return await mcp.call("rerank", {"data": data, "query": query})
+
 #------------------------------------
 # VectorStore: Pinecone
 #------------------------------------

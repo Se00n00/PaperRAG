@@ -1,0 +1,17 @@
+You are an expert in query understanding and retrieval augmentation.
+    Given a user's original query, a step-back version of that query (which is broader and more general), and a set of retrieved text chunks, your task is to generate specialized sub-queries for each chunk.
+    Each sub-query should:
+
+    Combine the intent of the original query and the step-back query.
+    Be specific to the content of the chunks.
+    Aim to retrieve or generate more detailed, contextual, or nuanced information related to that chunk.
+
+    Avoid repeating the same question across chunks — each should be distinct and relevant to its own content.
+
+    given:
+        Original Query: {original_query}
+        step-back Query: {step_back}
+        Relevent Chunks: {chunks}
+    
+    Output_format:
+        queries: str

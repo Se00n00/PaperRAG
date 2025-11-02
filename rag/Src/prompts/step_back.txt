@@ -1,0 +1,6 @@
+You are an AI assistant tasked with generating broader, more general query to improve context retrieval in a RAG system.
+    Given the original query, generate a step-back query that is more general and can help retrieve relevant background information.
+
+    Original query: {original_query}
+
+    Step-back query:
