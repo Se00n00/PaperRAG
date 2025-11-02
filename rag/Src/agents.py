@@ -63,10 +63,12 @@ naive_rag_graph = (
     .add_edge(START, "reterive")
     .compile(checkpointer = memory_rag1)
 )
+def query_router_conditional(state:State):
+    return state['decision']
 memory_rag2 = MemorySaver()
 advanced_rag_graph =(
     StateGraph(State)
-    .add_node("router_query", router_query)
+    .add_node("router_query",router_query)
     .add_node("step_back", step_back)
     .add_node("queries", speciallized_queries_generation)
     .add_node("filter_results", filter_results)
@@ -75,20 +77,21 @@ advanced_rag_graph =(
     .add_node("reterive",reterive)
     .add_node("reterive_queries",reterive_queries)
     .add_node("generate",generate)
-    .add_edge(START,"router_query")
+    .add_edge(START, "router_query")
     .add_conditional_edges(
         "router_query",
+        query_router_conditional,
         {"RETRIEVE":"step_back","DIRECT":"general_chat"}
     )
     .add_edge("step_back","reterive")
     .add_edge("reterive","queries")
     .add_edge("queries","reterive_queries")
-    .add_edge("reterive_queries","filter_results")
-    .add_edge("filter_results","re_rank_results")
+    .add_edge("reterive_queries","re_rank_results")
     .add_edge("re_rank_results","generate")
     .add_edge("general_chat",END)
     .add_edge("generate",END)
     .compile(checkpointer = memory_rag2)
 )
 # TODO: Hybrid Retreival
-# TODO: While fixing thread_id, fix the previous queries for memory
+# TODO: While fixing thread_id, store the previous queries for memory
+

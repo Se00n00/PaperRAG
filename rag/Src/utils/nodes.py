@@ -4,7 +4,7 @@ from langgraph.config import get_stream_writer
 from dotenv import load_dotenv
 import os
 
-from Src.utils.state import State, GenerativeModel, QueryRouter
+from Src.utils.state import State, GenerativeModel, QueryRouter, GenerateQueries
 from Src.utils.tools import get_embeddings, VectorStore, curated_index, rerank_index
 
 #----------------------------------
@@ -29,11 +29,11 @@ def get_text(path:str):
 #----------------------------------
 # Prompts
 #----------------------------------
-generator_prompt = ChatPromptTemplate.from_template(get_text("Src.prompts.generator.txt"))
-generate_queries_prompt = ChatPromptTemplate.from_template(get_text("Src.prompts.generate_queries.txt"))
-simple_generator_prompt = ChatPromptTemplate.from_template(get_text("Src.prompts.simple_generator.txt"))
-step_back_prompt = ChatPromptTemplate.from_template(get_text("Src.prompts.step_back.txt"))
-query_router_prompt = ChatPromptTemplate.from_template(get_text("Src.prompts.query_router.txt"))
+generator_prompt = ChatPromptTemplate.from_template(get_text("Src/prompts/generator.txt"))
+generate_queries_prompt = ChatPromptTemplate.from_template(get_text("Src/prompts/generate_queries.txt"))
+simple_generator_prompt = ChatPromptTemplate.from_template(get_text("Src/prompts/simple_generator.txt"))
+step_back_prompt = ChatPromptTemplate.from_template(get_text("Src/prompts/step_back.txt"))
+query_router_prompt = ChatPromptTemplate.from_template(get_text("Src/prompts/query_router.txt"))
 
 
 # ---------------------------------
@@ -57,24 +57,28 @@ async def speciallized_queries_generation(state:State):
         "chunks":state['context']}
     ).messages
     
-    response = llm.invoke(prompt)
+    queries_generator = llm.with_structured_output(GenerateQueries)
+    response = queries_generator.invoke(prompt)
 
     state["context"] = []
-    return {"queries":response}  
+    return {"queries":response.queries}  
 
 # ---------------------------------
 # ADVANCED RAG NODE: Post Retreiver
 # ---------------------------------`
 async def filter_results(state:State):
-    curated = await curated_index(state['context'],state['question']) # > Result Indexes of relevent docs
+    curated = await curated_index(state['context'], state['question']) # > Result Indexes of relevent docs
+    print("CURATED : ",curated)
     state['context'] = [state['context'][idx] for idx in curated]
+    print("CONTEXT : ", state['context'])
     return state
     
         
 
 async def re_rank_results(state:State):
-    re_ranked_indexes = await re_ranked_indexes(state['context'],state['question']) 
-    raise NotImplementedError
+    re_ranked = await rerank_index(state['context'],state['question']) 
+    state['context'] = [doc for doc, scores in sorted(re_ranked)]
+
     return state
 
 # ---------------------------------
@@ -139,14 +143,30 @@ async def reterive(state:State, config):
             "content":str(e)
         })
         return {"context": str(e)}
-    
+
+async def reterive_ingraph(state:State, config):
+    try:
+        embeddings = await get_embeddings([state['step_back']])
+        context = store.search(embeddings, namespace=config['metadata']["namespace"])
+        cont =  {"context":'\n\n'.join([i['id']+' Chunk: '+i['metadata']['chunk']for i in context])}
+        
+        return cont
+    except Exception as e:
+        writer = get_stream_writer()  
+        writer({
+            "type":"SYSTEM",
+            "heading": "",
+            "content":str(e)
+        })
+        return {"context": str(e)}
+
 async def reterive_queries(state:State, config):
     try:
         Context = []
         for query in state['queries']:
             embeddings = await get_embeddings([query])
-            context = store.search(embeddings, namespace=config['metadata']["namespace"])
-            cont =  '\n\n'.join([i['id']+' Chunk: '+i['metadata']['chunk']for i in context])
+            context = store.search(embeddings, namespace=config['metadata']["namespace"], top_k=1)
+            cont =  '\n\n'.join([i['metadata']['chunk'] for i in context])
             Context.append(cont)
         
         return {"context":Context}

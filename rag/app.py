@@ -1,6 +1,6 @@
 # from Utils.get_pdf_contents import get_pdf_content
 # from Utils.get_papers import get_papers, get_paper
-from Src.agents import agentic_rag, naive_rag_graph
+from Src.agents import agentic_rag, naive_rag_graph, advanced_rag_graph
 from Src.utils.tools import get_embeddings, VectorStore
 from Src.utils.state import GenerativeModel
 from Utils.pdf_utils import get_pdf_chunks, get_pdf_from_url, delete_pdf_file
@@ -179,7 +179,7 @@ async def chat(request: RequestModel):
         config= {"namespace":"notdecided", "configurable": {"thread_id": "abcd123"}}
 
         async def event_generator():
-            async for chunk in naive_rag_graph.astream(
+            async for chunk in advanced_rag_graph.astream(
                 {'question': query}, config, stream_mode="custom"
             ):
                 if isinstance(chunk, GenerativeModel):

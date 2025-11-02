@@ -7,7 +7,7 @@ class GenerativeModel(BaseModel):
   content: str
 
 class GenerateQueries(BaseModel):
-  queries: str
+  queries: list[str]
 
 # Node: Query Router
 class QueryRouter(BaseModel):
