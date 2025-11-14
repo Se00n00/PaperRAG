@@ -30,9 +30,16 @@
 # PaperRAG
 
 <div align="center">
-  <img src="demo.gif">
+  <a href="https://www.youtube.com/watch?v=m9QMwHktHRo">
+    <img src="demo.gif">
+  </a>
+  
 </div>
 
+<div align="center">
+  Click to view Demo video on youtube
+</div>
+  
 ---
 
 A Production grade full stack RAG application for answering queries related to online research papers
