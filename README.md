@@ -1,4 +1,4 @@
-<div align="center"><img src="logo_paperrag.png"></div>
+<div align="center" ><img height="200px" src="log_paperrag.png"></div>
 
 <div align="center">
 
@@ -60,7 +60,8 @@ A Production grade full stack RAG application for answering queries related to o
 
 ## Project Structure
 ```
-paper-rag/
+PaperRAG >
+rag/
 ├── app.py                  # FastAPI entrypoint – exposes the RAG pipeline as API endpoints
 ├── requirements.txt        # All Python dependencies for the project
 ├── Dockerfile              # Docker setup for production-ready deployment
