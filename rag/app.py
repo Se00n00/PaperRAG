@@ -17,7 +17,7 @@ import os
 import numpy as np
 from pinecone import Pinecone
 from langchain_core.messages import AIMessage
-
+4
 
 test_data = [
     "content : The Amazon rainforest is the largest tropical rainforest in the world.",
