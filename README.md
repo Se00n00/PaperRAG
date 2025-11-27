@@ -3,26 +3,13 @@
 <div align="center">
 
 ![FastAPI](https://img.shields.io/pypi/v/fastapi?label=FastAPI&logo=fastapi&logoColor=white)
-![Uvicorn](https://img.shields.io/pypi/v/uvicorn?label=Uvicorn&logo=uvicorn&logoColor=white)
-![Pydantic](https://img.shields.io/pypi/v/pydantic?label=Pydantic&logo=pydantic&logoColor=white)
-![NumPy](https://img.shields.io/pypi/v/numpy?label=NumPy&logo=numpy&logoColor=white)
 
 ![Pinecone](https://img.shields.io/badge/Pinecone-Latest-blue?logo=pinecone)
-![Supabase](https://img.shields.io/badge/Supabase-Latest-green?logo=supabase)
 ![LangChain](https://img.shields.io/pypi/v/langchain?label=LangChain&logo=langchain)
 ![LangGraph](https://img.shields.io/pypi/v/langgraph?label=LangGraph)
-![LangChain Core](https://img.shields.io/pypi/v/langchain-core?label=LangChain-Core)
-![LangChain Community](https://img.shields.io/pypi/v/langchain-community?label=LangChain-Community)
 ![LangChain OpenAI](https://img.shields.io/pypi/v/langchain-openai?label=LangChain-OpenAI)
 
-![PyMuPDF](https://img.shields.io/pypi/v/PyMuPDF?label=PyMuPDF)
-![PyPDF](https://img.shields.io/pypi/v/pypdf?label=PyPDF)
-![BeautifulSoup4](https://img.shields.io/pypi/v/beautifulsoup4?label=BeautifulSoup4)
 ![SemanticScholar](https://img.shields.io/pypi/v/semanticscholar?label=SemanticScholar)
-
-![dotenv](https://img.shields.io/pypi/v/python-dotenv?label=python-dotenv)
-![asyncio](https://img.shields.io/badge/asyncio-built--in-blue)
-![typing](https://img.shields.io/badge/typing-built--in-lightgrey)
 ![fastmcp](https://img.shields.io/pypi/v/fastmcp?label=fastmcp)
 
 </div>
@@ -64,6 +51,28 @@ A Production grade full stack RAG application for answering queries related to o
 
 **Generation**
 - Generate the answer with given context only (if query router had pointed to rag portion) else generate only from learned patterns
+
+
+# Evaluation Summary
+
+## **Comparison of RAG Approaches (Mean Metrics)**
+
+| Metric                        | Naive RAG | Advanced RAG (WO Hybrid Retrieval) | Advanced RAG + Hybrid Retrieval |
+| ----------------------------- | --------- | --------------------------- | ------------------------ |
+| **Correctness**               | 0.188     | 0.215                       | **0.285**                |
+| **Groundness**                | 0.876     | 0.813                       | **0.830**                |
+| **Relevance**                 | 0.648     | 0.710                       | **0.837**                |
+| **Retrieval Relevance**       | **0.860** | 0.796                       | 0.619                    |
+| **Coherence**                 | **0.912** | 0.909                       | 0.993                    |
+| **String Similarity**         | 0.173     | 0.193                       | **0.196**                |
+| **BLEU**                      | 0.0218    | 0.0224                      | **0.0245**               |
+| **ROUGE-L**                   | 0.0830    | 0.1091                      | **0.1118**               |
+| **Non-LLM Context Precision** | 0.0102    | **0.0167**                  | 0.0158                   |
+| **LLM Context Recall**        | 0.213     | 0.198                       | **0.334**                |
+| **LLM Context Precision**     | **0.525** | 0.506                       | 0.490                    |
+
+---
+
 
 ## Project Structure
 ```
