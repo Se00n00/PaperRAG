@@ -63,7 +63,7 @@ A Production grade full stack RAG application for answering queries related to o
 | **Groundness**                | 0.876     | 0.813                       | **0.830**                |
 | **Relevance**                 | 0.648     | 0.710                       | **0.837**                |
 | **Retrieval Relevance**       | **0.860** | 0.796                       | 0.619                    |
-| **Coherence**                 | **0.912** | 0.909                       | 0.993                    |
+| **Coherence**                 |   0.912   | 0.909                       | **0.993**                |
 | **String Similarity**         | 0.173     | 0.193                       | **0.196**                |
 | **BLEU**                      | 0.0218    | 0.0224                      | **0.0245**               |
 | **ROUGE-L**                   | 0.0830    | 0.1091                      | **0.1118**               |
