@@ -14,8 +14,7 @@
 
 </div>
 
-# PaperRAG
-
+# PaperRAG [[RAG-CODE](https://github.com/Se00n00/PaperRAG/tree/main/rag)]
 <div align="center">
   <a href="https://www.youtube.com/watch?v=m9QMwHktHRo">
     <img src="demo.gif">
